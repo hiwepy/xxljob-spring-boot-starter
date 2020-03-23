@@ -1,0 +1,12 @@
+soapui:
+  cache-definitions: true
+  create-requests: true
+  settings:
+    http:
+      max-total-connections: 3000
+    wsdl:
+      cache-wsdls: true
+      
+      
+  
+    
