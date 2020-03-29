@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -36,14 +34,7 @@ import com.xxl.job.spring.boot.dto.XxlJobGroup;
 import com.xxl.job.spring.boot.dto.XxlJobInfo;
 import com.xxl.job.spring.boot.dto.XxlJobModel;
 
-/**
- * TODO
- * @author 		： <a href="https://github.com/hiwepy">wandl</a>
- */
-
 public class XxlJobTemplate {
-	
-	private Logger log = LoggerFactory.getLogger(getClass());
 	
     private static String JOBGROUP_SAVE = "/jobgroup/save";
     private static String JOBGROUP_UPDATE = "/jobgroup/update";
