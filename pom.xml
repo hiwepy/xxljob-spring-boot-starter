@@ -399,62 +399,6 @@
 			    <artifactId>fastjson</artifactId>
 			    <version>${fastjson.version}</version>
 			</dependency>
-			
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom -->
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>logging-interceptor</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okcurl -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okcurl</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-urlconnection -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp-urlconnection</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-tls -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp-tls</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-dnsoverhttps -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp-dnsoverhttps</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-apache -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp-apache</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-sse -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp-sse</artifactId>
-				<version>${okhttp3.version}</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor -->
-			<dependency>
-			    <groupId>com.squareup.okhttp3</groupId>
-			    <artifactId>logging-interceptor</artifactId>
-			    <version>${okhttp3.version}</version>
-			</dependency>
 			<!-- https://mvnrepository.com/artifact/com.xuxueli/xxl-job-core -->
 			<dependency>
 			    <groupId>com.xuxueli</groupId>
@@ -514,12 +458,13 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		
+		<dependency>
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>fastjson</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>com.xuxueli</groupId>

@@ -27,7 +27,7 @@ public class MapUtil {
     }
 
     public static MultiValueMap<String, String> obj2Map(Object obj) {
-        MultiValueMap<String, String> map = new LinkedMultiValueMap();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         Field[] fields = obj.getClass().getDeclaredFields();
         int i = 0;
 
@@ -54,7 +54,7 @@ public class MapUtil {
     }
 
     public static MultiValueMap<String, String> obj2MapWithNull(Object obj) {
-        MultiValueMap<String, String> map = new LinkedMultiValueMap();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         Field[] fields = obj.getClass().getDeclaredFields();
         int i = 0;
 
@@ -83,7 +83,7 @@ public class MapUtil {
     }
 
     public static MultiValueMap<String, String> obj2MapWithString(Object obj) {
-        MultiValueMap<String, String> map = new LinkedMultiValueMap();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         Field[] fields = obj.getClass().getDeclaredFields();
         int i = 0;
 
