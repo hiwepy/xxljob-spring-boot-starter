@@ -40,7 +40,7 @@ public class XxlJobExecutorProperties {
 	/**
 	 * 	执行器端口号 [选填]：小于等于0则自动获取；默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；
 	 */
-	private int port = -1;
+	private String port = "-1";
 	/**
 	 * 	执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；
 	 */
