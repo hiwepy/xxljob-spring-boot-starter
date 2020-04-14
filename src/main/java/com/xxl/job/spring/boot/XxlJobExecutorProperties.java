@@ -17,6 +17,8 @@ package com.xxl.job.spring.boot;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -49,5 +51,12 @@ public class XxlJobExecutorProperties {
 	 * 	执行器日志保存天数 [选填] ：值大于3时生效，启用执行器Log文件定期清理功能，否则不生效；
 	 */
 	private int logretentiondays = 30;
+	/**
+	 * 	执行器执行失败重试错误
+	 */
+	private int failRetryCount = 3;
+	
+	
+	private ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.COVER_EARLY;
 	
 }

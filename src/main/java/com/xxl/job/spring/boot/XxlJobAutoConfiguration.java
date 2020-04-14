@@ -41,10 +41,13 @@ public class XxlJobAutoConfiguration {
 	
 	@Bean(initMethod = "start", destroyMethod = "destroy")
 	@ConditionalOnMissingBean
-	public XxlJobSpringExecutor xxlJobExecutor(XxlJobProperties properties, XxlJobAdminProperties adminProperties,
+	public XxlJobSpringExecutor xxlJobExecutor(
+			XxlJobTemplate xxlJobTemplate,
+			XxlJobProperties properties, 
+			XxlJobAdminProperties adminProperties,
 			XxlJobExecutorProperties executorProperties) {
 		logger.info(">>>>>>>>>>> xxl-job config init.");
-		XxlJobSpringExecutor xxlJobExecutor = new XxlJobSpringExecutor();
+		XxlJobSpringExecutorWhitRegister xxlJobExecutor = new XxlJobSpringExecutorWhitRegister(xxlJobTemplate);
 		xxlJobExecutor.setAdminAddresses(adminProperties.getAddresses());
 		xxlJobExecutor.setAppName(executorProperties.getAppname());
 		xxlJobExecutor.setIp(executorProperties.getIp());
@@ -54,6 +57,7 @@ public class XxlJobAutoConfiguration {
 		xxlJobExecutor.setLogRetentionDays(executorProperties.getLogretentiondays());
 		return xxlJobExecutor;
 	}
+	
 	 
 	@PostConstruct
 	public void init() {

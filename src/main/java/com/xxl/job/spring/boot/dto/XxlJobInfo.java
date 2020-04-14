@@ -55,10 +55,5 @@ public class XxlJobInfo {
 	private int triggerStatus;		// 调度状态：0-停止，1-运行
 	private long triggerLastTime;	// 上次调度时间
 	private long triggerNextTime;	// 下次调度时间
-
-	private String jobStatus;
-	private String appName;
-	private Integer bizType;
-	private String bizCode;
 	
 }

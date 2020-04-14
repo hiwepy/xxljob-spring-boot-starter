@@ -63,6 +63,14 @@ public class XxlJobTemplate {
 	 * 获取xxl-job 执行器列表数据
 	 */
     public ResponseEntity<String> jobinfoList(int start, int length, int jobGroup, 
+			int triggerStatus) {
+    	return this.jobinfoList(start, length, jobGroup, triggerStatus, "", "", "");
+	}
+	
+	/**
+	 * 获取xxl-job 执行器列表数据
+	 */
+    public ResponseEntity<String> jobinfoList(int start, int length, int jobGroup, 
 			int triggerStatus, String jobDesc, String executorHandler, String author) {
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
