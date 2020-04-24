@@ -39,7 +39,7 @@ public class XxlJobAutoConfiguration {
 		return new XxlJobTemplate(restTemplate, properties);
 	}
 	
-	@Bean(initMethod = "start", destroyMethod = "destroy")
+	@Bean
 	@ConditionalOnMissingBean
 	public XxlJobSpringExecutor xxlJobExecutor(
 			XxlJobTemplate xxlJobTemplate,
