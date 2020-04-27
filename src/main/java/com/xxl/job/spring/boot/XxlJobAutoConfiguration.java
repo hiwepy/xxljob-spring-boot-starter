@@ -35,8 +35,10 @@ public class XxlJobAutoConfiguration {
 	}
 	
 	@Bean
-	public XxlJobTemplate xxlJobTemplate(RestTemplate restTemplate, XxlJobProperties properties) throws Exception {
-		return new XxlJobTemplate(restTemplate, properties);
+	public XxlJobTemplate xxlJobTemplate(RestTemplate restTemplate, XxlJobProperties properties,
+			XxlJobAdminProperties adminProperties, 
+			XxlJobExecutorProperties executorProperties) throws Exception {
+		return new XxlJobTemplate(restTemplate, properties, adminProperties, executorProperties);
 	}
 	
 	@Bean

@@ -185,19 +185,23 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         xxlJobInfo.setJobCron(jobCron.cron());
         xxlJobInfo.setJobDesc(jobCron.desc());
         
-        ResponseEntity<String> response =  getXxlJobTemplate().addJob(xxlJobInfo);
-        if(response.getStatusCode().is2xxSuccessful()) {
-        	 String jobStr = response.getBody();
-        	 ReturnT<String> returnT = JSON.parseObject(jobStr, new TypeReference<ReturnT<String>>() {
-             });
-        	 
-             if (returnT.getCode() == ReturnT.FAIL_CODE) {
-            	 logger.error(name + "定时任务添加添加失败!失败原因:{}", returnT.getMsg());
-             } else {
-            	 logger.error(name + "定时任务添加添加成功!");
-            	 getXxlJobTemplate().startJob(Integer.parseInt(returnT.getContent()));
-             }
-        }
+        try {
+			ResponseEntity<String> response =  getXxlJobTemplate().addJob(xxlJobInfo);
+			if(response.getStatusCode().is2xxSuccessful()) {
+				 String jobStr = response.getBody();
+				 ReturnT<String> returnT = JSON.parseObject(jobStr, new TypeReference<ReturnT<String>>() {
+			     });
+				 
+			     if (returnT.getCode() == ReturnT.FAIL_CODE) {
+			    	 logger.error(name + "定时任务添加添加失败!失败原因:{}", returnT.getMsg());
+			     } else {
+			    	 logger.error(name + "定时任务添加添加成功!");
+			    	 getXxlJobTemplate().startJob(Integer.parseInt(returnT.getContent()));
+			     }
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
     
 	public XxlJobTemplate getXxlJobTemplate() {

@@ -54,9 +54,13 @@ public class XxlJobTemplate {
 	protected XxlJobAdminProperties adminProperties;
 	protected XxlJobExecutorProperties executorProperties;
 	
-	public XxlJobTemplate( RestTemplate restTemplate, XxlJobProperties properties) {
+	public XxlJobTemplate( RestTemplate restTemplate, XxlJobProperties properties, 
+			XxlJobAdminProperties adminProperties, 
+			XxlJobExecutorProperties executorProperties) {
 		this.restTemplate = restTemplate;
 		this.properties = properties;
+		this.adminProperties = adminProperties;
+		this.executorProperties = executorProperties;
 	}
 	
 	/**
