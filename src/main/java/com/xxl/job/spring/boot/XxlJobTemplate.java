@@ -30,6 +30,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.spring.boot.dto.MapUtil;
 import com.xxl.job.spring.boot.dto.XxlJobGroup;
 import com.xxl.job.spring.boot.dto.XxlJobInfo;
 import com.xxl.job.spring.boot.dto.XxlJobModel;
@@ -103,9 +104,8 @@ public class XxlJobTemplate {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        //MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
-        //HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(xxlJobInfoMap, headers);
-		HttpEntity<XxlJobInfo> request = new HttpEntity<>(xxlJobInfo, headers);
+        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD), request, String.class);
         return response;
     }
@@ -114,9 +114,8 @@ public class XxlJobTemplate {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        //MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
-        // HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(xxlJobInfoMap, headers);
-        HttpEntity<XxlJobInfo> request = new HttpEntity<>(xxlJobInfo, headers);
+        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_UPDATE), request, String.class);
         return response;
     }
