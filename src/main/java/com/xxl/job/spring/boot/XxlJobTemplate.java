@@ -36,6 +36,7 @@ import com.xxl.job.spring.boot.dto.XxlJobModel;
 
 public class XxlJobTemplate {
 	
+	private static String XXL_RPC_ACCESS_TOKEN = "XXL-RPC-ACCESS-TOKEN";
     private static String JOBGROUP_SAVE = "/jobgroup/save";
     private static String JOBGROUP_UPDATE = "/jobgroup/update";
     private static String JOBGROUP_REMOVE = "/jobgroup/remove";
@@ -89,6 +90,7 @@ public class XxlJobTemplate {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
 		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_PAGELIST),
 				request, String.class);
@@ -100,24 +102,29 @@ public class XxlJobTemplate {
     public ResponseEntity<String> addJob(XxlJobInfo xxlJobInfo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         //MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
         //HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(xxlJobInfoMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD), xxlJobInfo, String.class);
+		HttpEntity<XxlJobInfo> request = new HttpEntity<>(xxlJobInfo, headers);
+        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD), request, String.class);
         return response;
     }
 
     public ResponseEntity<String> updateJob(XxlJobInfo xxlJobInfo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         //MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
         // HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(xxlJobInfoMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_UPDATE), xxlJobInfo, String.class);
+        HttpEntity<XxlJobInfo> request = new HttpEntity<>(xxlJobInfo, headers);
+        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_UPDATE), request, String.class);
         return response;
     }
 
     public ResponseEntity<String> removeJob(Integer jobInfoId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         HttpEntity<Integer> request = new HttpEntity<Integer>(jobInfoId, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_REMOVE), request, String.class);
         return response;
@@ -126,6 +133,7 @@ public class XxlJobTemplate {
     public ResponseEntity<String> stopJob(int jobInfoId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         HttpEntity<Integer> request = new HttpEntity<Integer>(jobInfoId, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_STOP), request, String.class);
         return response;
@@ -134,6 +142,7 @@ public class XxlJobTemplate {
     public ResponseEntity<String> startJob(int jobInfoId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         HttpEntity<Integer> request = new HttpEntity<Integer>(jobInfoId, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_START), request, String.class);
         return response;
@@ -148,6 +157,7 @@ public class XxlJobTemplate {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
 		
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_TRIGGER), request, String.class);
@@ -157,6 +167,7 @@ public class XxlJobTemplate {
 	public ResponseEntity<String> addGroup(XxlJobGroup xxlJobGroup) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
 		//MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
 		HttpEntity<XxlJobGroup> request = new HttpEntity<XxlJobGroup>(xxlJobGroup, headers);
 		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_SAVE), request, String.class);
@@ -167,6 +178,7 @@ public class XxlJobTemplate {
 	public ResponseEntity<String> updateGroup(XxlJobGroup xxlJobGroup) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
 		//MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
 		HttpEntity<XxlJobGroup> request = new HttpEntity<XxlJobGroup>(xxlJobGroup, headers);
 		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_UPDATE), request, String.class);
@@ -177,6 +189,7 @@ public class XxlJobTemplate {
     public ResponseEntity<String> removeGroup(int jobGroupId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         HttpEntity<Integer> request = new HttpEntity<Integer>(jobGroupId, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_REMOVE), request, String.class);
         return response;
@@ -185,6 +198,7 @@ public class XxlJobTemplate {
     public ResponseEntity<String> getGroup(int jobGroupId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
         HttpEntity<Integer> request = new HttpEntity<Integer>(jobGroupId, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_GET), request, String.class);
         return response;
