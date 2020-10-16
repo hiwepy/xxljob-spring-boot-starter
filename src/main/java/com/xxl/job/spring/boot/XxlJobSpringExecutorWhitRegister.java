@@ -117,7 +117,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 		            logger.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getJobCron());
 
 		            xxlJobInfo.setJobGroup(Integer.parseInt(returnT1.getContent()));
-		    		ResponseEntity<String> response =  getXxlJobTemplate().addJob(xxlJobInfo);
+		    		ResponseEntity<String> response =  getXxlJobTemplate().addJobOrUpdate(xxlJobInfo);
 		    		if(response.getStatusCode().is2xxSuccessful()) {
 		    			 String jobStr = response.getBody();
 		    			 ReturnT<String> returnT = JSON.parseObject(jobStr, new TypeReference<ReturnT<String>>() {
@@ -127,7 +127,12 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 		    		    	 logger.error(xxlJobInfo.getExecutorHandler() + "定时任务添加添加失败!失败原因:{}", returnT.getMsg());
 		    		     } else {
 		    		    	 logger.error(xxlJobInfo.getExecutorHandler() + "定时任务添加添加成功!");
-		    		    	 getXxlJobTemplate().startJob(Integer.parseInt(returnT.getContent()));
+		    		    	 
+		    		    	 try {
+								getXxlJobTemplate().startJob(Integer.parseInt(returnT.getContent()));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 		    		     }
 		    		}
 				}

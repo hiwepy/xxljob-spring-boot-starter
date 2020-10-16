@@ -46,6 +46,7 @@ public class XxlJobTemplate {
     
     private static String JOBINFO_PAGELIST = "/jobinfo/pageList";
 	private static String JOBINFO_ADD = "/jobinfo/add";
+	private static String JOBINFO_ADD_UPDATE = "/jobinfo/addOrUpdate";
     private static String JOBINFO_UPDATE = "/jobinfo/update";
     private static String JOBINFO_REMOVE = "/jobinfo/remove";
     private static String JOBINFO_STOP = "/jobinfo/stop";
@@ -108,6 +109,16 @@ public class XxlJobTemplate {
         MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD), request, String.class);
+        return response;
+    }
+    
+    public ResponseEntity<String> addJobOrUpdate(XxlJobInfo xxlJobInfo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
+        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
+        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD_UPDATE), request, String.class);
         return response;
     }
 
