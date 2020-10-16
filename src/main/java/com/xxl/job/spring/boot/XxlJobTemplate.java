@@ -121,11 +121,13 @@ public class XxlJobTemplate {
         return response;
     }
 
-    public ResponseEntity<String> removeJob(Integer jobInfoId) {
+    public ResponseEntity<String> removeJob(int jobInfoId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        HttpEntity<Integer> request = new HttpEntity<Integer>(jobInfoId, headers);
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_REMOVE), request, String.class);
         return response;
     }
@@ -134,7 +136,9 @@ public class XxlJobTemplate {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        HttpEntity<Integer> request = new HttpEntity<Integer>(jobInfoId, headers);
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_STOP), request, String.class);
         return response;
     }
@@ -143,22 +147,24 @@ public class XxlJobTemplate {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        HttpEntity<Integer> request = new HttpEntity<Integer>(jobInfoId, headers);
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_START), request, String.class);
         return response;
     }
     
     public ResponseEntity<String> triggerJob(int jobInfoId, String executorParam) {
     	
-    	MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    	MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
 
-		params.put("id", Collections.singletonList(jobInfoId));
-		params.put("executorParam", Collections.singletonList(executorParam));
+	    paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
+		paramMap.put("executorParam", Collections.singletonList(executorParam));
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
         ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_TRIGGER), request, String.class);
         return response;
     }

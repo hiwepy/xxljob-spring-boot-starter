@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
+import com.xxl.job.spring.boot.ExecutorRouteStrategyEnum;
 
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
@@ -66,7 +67,7 @@ public @interface XxlJobCron {
 	/**
 	 * 执行器路由策略
 	 */
-	String routeStrategy() default "";
+	ExecutorRouteStrategyEnum routeStrategy() default ExecutorRouteStrategyEnum.LEAST_FREQUENTLY_USED;
 
 	/**
 	 * 任务执行超时时间，单位秒

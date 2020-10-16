@@ -56,6 +56,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	 */
 	private String appName;
 	private List<XxlJobInfo> cacheJobs = new ArrayList<>(); 
+	private Random RANDOM_ORDER = new Random(10);
 	
 	public XxlJobSpringExecutorWhitRegister(XxlJobTemplate xxlJobTemplate) {
 		this.xxlJobTemplate = xxlJobTemplate;
@@ -100,7 +101,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
     	xxlJobGroup.setAppName(this.getAppName());
     	//xxlJobGroup.setAddressList(addressList);
     	xxlJobGroup.setAddressType(0);
-    	xxlJobGroup.setOrder(new Random().nextInt());
+    	xxlJobGroup.setOrder(RANDOM_ORDER.nextInt(1000));
     	//xxlJobGroup.setRegistryList(registryList);
     	xxlJobGroup.setTitle(this.getAppName());
     	
@@ -145,7 +146,8 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         super.destroy();
     }
 
-    private void initJobHandlerRepository(ApplicationContext applicationContext) {
+    @SuppressWarnings("deprecation")
+	private void initJobHandlerRepository(ApplicationContext applicationContext) {
         if (applicationContext == null) {
             return;
         }
@@ -258,7 +260,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         xxlJobInfo.setExecutorFailRetryCount(xxlJobCron.failRetryCount());
         xxlJobInfo.setExecutorHandler(name);
         xxlJobInfo.setExecutorParam(xxlJobCron.param());
-        xxlJobInfo.setExecutorRouteStrategy(xxlJobCron.routeStrategy());
+        xxlJobInfo.setExecutorRouteStrategy(xxlJobCron.routeStrategy().name());
         xxlJobInfo.setExecutorTimeout(xxlJobCron.timeout());
         xxlJobInfo.setGlueType(GlueTypeEnum.BEAN.name());
         xxlJobInfo.setJobCron(xxlJobCron.cron());
@@ -273,17 +275,11 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	}
 	
     // ---------------------- applicationContext ----------------------
-	public static ApplicationContext applicationContext;
+	public ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    
     
 }
