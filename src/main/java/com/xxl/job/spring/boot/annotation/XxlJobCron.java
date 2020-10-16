@@ -29,11 +29,6 @@ import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 public @interface XxlJobCron {
 
 	/**
-	 * 任务执行分组ID
-	 */
-	int group();
-	
-	/**
 	 * 任务执行CRON表达式
 	 */
 	String cron() default "";

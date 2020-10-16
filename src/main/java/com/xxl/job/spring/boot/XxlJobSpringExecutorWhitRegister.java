@@ -16,7 +16,10 @@
 package com.xxl.job.spring.boot;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -36,6 +40,7 @@ import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.handler.impl.MethodJobHandler;
 import com.xxl.job.spring.boot.annotation.XxlJobCron;
+import com.xxl.job.spring.boot.dto.XxlJobGroup;
 import com.xxl.job.spring.boot.dto.XxlJobInfo;
 
 /**
@@ -46,11 +51,26 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(XxlJobSpringExecutorWhitRegister.class);
 	private final XxlJobTemplate xxlJobTemplate;
+	/**
+	 * 	执行器AppName [必填]：执行器心跳注册分组依据；为空则关闭自动注册.
+	 */
+	private String appName;
+	private List<XxlJobInfo> cacheJobs = new ArrayList<>(); 
 	
 	public XxlJobSpringExecutorWhitRegister(XxlJobTemplate xxlJobTemplate) {
 		this.xxlJobTemplate = xxlJobTemplate;
 	}
-	
+
+	@Override
+	public void setAppName(String appName) {
+		super.setAppName(appName);
+		this.appName = appName;
+	}
+    
+	public String getAppName() {
+		return appName;
+	}
+
 	// start
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -64,10 +84,61 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         // refresh GlueFactory
         GlueFactory.refreshInstance(1);
 
-        // super start
-        super.start();
+        // this start
+        this.start();
     }
 
+    @Override
+    public void start() throws Exception {
+    	super.start();
+    	
+    	if(!StringUtils.hasText(this.getAppName())) {
+    		return;
+    	}
+    	
+    	XxlJobGroup xxlJobGroup = new XxlJobGroup();
+    	xxlJobGroup.setAppName(this.getAppName());
+    	//xxlJobGroup.setAddressList(addressList);
+    	xxlJobGroup.setAddressType(0);
+    	xxlJobGroup.setOrder(new Random().nextInt());
+    	//xxlJobGroup.setRegistryList(registryList);
+    	xxlJobGroup.setTitle(this.getAppName());
+    	
+		ResponseEntity<String> response1 =  getXxlJobTemplate().addOrUpdateGroup(xxlJobGroup);
+		if(response1.getStatusCode().is2xxSuccessful()) {
+			ReturnT<String> returnT1 = JSON.parseObject(response1.getBody(), new TypeReference<ReturnT<String>>() {});
+			if (returnT1.getCode() == ReturnT.FAIL_CODE) {
+		    	logger.error(this.getAppName() + "执行器添加添加失败!失败原因:{}", returnT1.getMsg());
+		    } else {
+		    	logger.error(this.getAppName() + "执行器添加添加成功!");
+		    	for (XxlJobInfo xxlJobInfo : cacheJobs) {
+
+		            logger.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getJobCron());
+
+		            xxlJobInfo.setJobGroup(Integer.parseInt(returnT1.getContent()));
+		    		ResponseEntity<String> response =  getXxlJobTemplate().addJob(xxlJobInfo);
+		    		if(response.getStatusCode().is2xxSuccessful()) {
+		    			 String jobStr = response.getBody();
+		    			 ReturnT<String> returnT = JSON.parseObject(jobStr, new TypeReference<ReturnT<String>>() {
+		    		     });
+		    			 
+		    		     if (returnT.getCode() == ReturnT.FAIL_CODE) {
+		    		    	 logger.error(xxlJobInfo.getExecutorHandler() + "定时任务添加添加失败!失败原因:{}", returnT.getMsg());
+		    		     } else {
+		    		    	 logger.error(xxlJobInfo.getExecutorHandler() + "定时任务添加添加成功!");
+		    		    	 getXxlJobTemplate().startJob(Integer.parseInt(returnT.getContent()));
+		    		     }
+		    		}
+				}
+		    }
+			
+			
+		}
+		
+		
+    	
+    }
+    
     // destroy
     @Override
     public void destroy() {
@@ -163,10 +234,10 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	                            throw new RuntimeException("xxl-job method-jobhandler destroyMethod invalid, for[" + bean.getClass() + "#"+ method.getName() +"] .");
 	                        }
 	                    }
-	
 	                    // registry jobhandler
 	                    registJobHandler(name, new MethodJobHandler(bean, method, initMethod, destroyMethod));
 	                    registJobHandlerCronTask(name, xxlJobCron);
+	                    
 	                }
 	            }
 
@@ -177,46 +248,32 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         
     }
     
-	private void registJobHandlerCronTask(String name, XxlJobCron jobCron) {
+	private void registJobHandlerCronTask(String name, XxlJobCron xxlJobCron) {
     	
-        logger.info(">>>>>>>>>>> xxl-job cron task register jobhandler success, name:{}, cron :{}", name, jobCron.cron());
-        
         XxlJobInfo xxlJobInfo = new XxlJobInfo();
         
-        xxlJobInfo.setAuthor(jobCron.author());
-        xxlJobInfo.setAlarmEmail(jobCron.alarmEmail());
-        xxlJobInfo.setExecutorBlockStrategy(jobCron.blockStrategy().name());
-        xxlJobInfo.setExecutorFailRetryCount(jobCron.failRetryCount());
+        xxlJobInfo.setAuthor(xxlJobCron.author());
+        xxlJobInfo.setAlarmEmail(xxlJobCron.alarmEmail());
+        xxlJobInfo.setExecutorBlockStrategy(xxlJobCron.blockStrategy().name());
+        xxlJobInfo.setExecutorFailRetryCount(xxlJobCron.failRetryCount());
         xxlJobInfo.setExecutorHandler(name);
-        xxlJobInfo.setExecutorParam(jobCron.param());
-        xxlJobInfo.setExecutorRouteStrategy(jobCron.routeStrategy());
-        xxlJobInfo.setExecutorTimeout(jobCron.timeout());
+        xxlJobInfo.setExecutorParam(xxlJobCron.param());
+        xxlJobInfo.setExecutorRouteStrategy(xxlJobCron.routeStrategy());
+        xxlJobInfo.setExecutorTimeout(xxlJobCron.timeout());
         xxlJobInfo.setGlueType(GlueTypeEnum.BEAN.name());
-        xxlJobInfo.setJobGroup(jobCron.group());
-        xxlJobInfo.setJobCron(jobCron.cron());
-        xxlJobInfo.setJobDesc(jobCron.desc());
+        xxlJobInfo.setJobCron(xxlJobCron.cron());
+        xxlJobInfo.setJobDesc(xxlJobCron.desc());
         
-		ResponseEntity<String> response =  getXxlJobTemplate().addJob(xxlJobInfo);
-		if(response.getStatusCode().is2xxSuccessful()) {
-			 String jobStr = response.getBody();
-			 ReturnT<String> returnT = JSON.parseObject(jobStr, new TypeReference<ReturnT<String>>() {
-		     });
-			 
-		     if (returnT.getCode() == ReturnT.FAIL_CODE) {
-		    	 logger.error(name + "定时任务添加添加失败!失败原因:{}", returnT.getMsg());
-		     } else {
-		    	 logger.error(name + "定时任务添加添加成功!");
-		    	 getXxlJobTemplate().startJob(Integer.parseInt(returnT.getContent()));
-		     }
-		}
+        cacheJobs.add(xxlJobInfo);
+        
     }
     
 	public XxlJobTemplate getXxlJobTemplate() {
 		return xxlJobTemplate;
 	}
-
+	
     // ---------------------- applicationContext ----------------------
-    private static ApplicationContext applicationContext;
+	public static ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -227,4 +284,6 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         return applicationContext;
     }
 
+    
+    
 }
