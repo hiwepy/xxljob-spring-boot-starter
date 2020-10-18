@@ -48,10 +48,10 @@ public class XxlJobAutoConfiguration {
 			XxlJobProperties properties, 
 			XxlJobAdminProperties adminProperties,
 			XxlJobExecutorProperties executorProperties) {
-		logger.info(">>>>>>>>>>> xxl-job config init.");
+		logger.info(">>>>>>>>>>> xxl-job executor init.");
 		XxlJobSpringExecutorWhitRegister xxlJobExecutor = new XxlJobSpringExecutorWhitRegister(xxlJobTemplate);
 		xxlJobExecutor.setAdminAddresses(adminProperties.getAddresses());
-		xxlJobExecutor.setAppName(executorProperties.getAppname());
+		xxlJobExecutor.setAppname(executorProperties.getAppname());
 		xxlJobExecutor.setIp(executorProperties.getIp());
 		xxlJobExecutor.setPort(Integer.parseInt(executorProperties.getPort()));
 		xxlJobExecutor.setAccessToken(properties.getAccessToken());

@@ -380,7 +380,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<fastjson.version>1.2.67</fastjson.version>
 		<okhttp3.version>3.14.7</okhttp3.version>
-		<xxljob.version>2.1.2</xxljob.version>
+		<xxljob.version>2.2.0</xxljob.version>
 		<maven.version>3.0</maven.version>
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
