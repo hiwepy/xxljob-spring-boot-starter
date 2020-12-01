@@ -44,8 +44,6 @@ xxl.job.executor.logretentiondays=30
 
 ##### 3、使用示例
 
-腾讯云短信（Short Message Service，SMS）
-
 ```java
 
 import java.io.BufferedInputStream;
