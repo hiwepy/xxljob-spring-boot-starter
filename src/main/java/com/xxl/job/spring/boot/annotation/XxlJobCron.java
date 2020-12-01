@@ -29,47 +29,47 @@ import com.xxl.job.spring.boot.ExecutorRouteStrategyEnum;
 @Inherited
 public @interface XxlJobCron {
 
-	/**
+	/*
 	 * 任务执行CRON表达式
 	 */
 	String cron() default "";
 
-	/**
+	/*
 	 * 负责人
 	 */
 	String author() default "xxl-job";
 
-	/**
+	/*
 	 * 报警邮件
 	 */
 	String alarmEmail() default "";
 
-	/**
+	/*
 	 * 执行器描述
 	 */
 	String desc() default "";
 
-	/**
+	/*
 	 * 执行器，任务参数
 	 */
 	String param() default "";
 
-	/**
+	/*
 	 * 失败重试次数
 	 */
 	int failRetryCount() default 3;
 
-	/**
+	/*
 	 * 阻塞处理策略
 	 */
 	ExecutorBlockStrategyEnum blockStrategy() default ExecutorBlockStrategyEnum.COVER_EARLY;
 
-	/**
+	/*
 	 * 执行器路由策略
 	 */
 	ExecutorRouteStrategyEnum routeStrategy() default ExecutorRouteStrategyEnum.LEAST_FREQUENTLY_USED;
 
-	/**
+	/*
 	 * 任务执行超时时间，单位秒
 	 */
 	int timeout() default 3000;

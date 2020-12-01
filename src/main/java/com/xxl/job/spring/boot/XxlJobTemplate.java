@@ -67,7 +67,7 @@ public class XxlJobTemplate {
 		this.executorProperties = executorProperties;
 	}
 	
-	/**
+	/*
 	 * 获取xxl-job 执行器列表数据
 	 */
     public ResponseEntity<String> jobinfoList(int start, int length, int jobGroup, 
@@ -75,7 +75,7 @@ public class XxlJobTemplate {
     	return this.jobinfoList(start, length, jobGroup, triggerStatus, "", "", "");
 	}
 	
-	/**
+	/*
 	 * 获取xxl-job 执行器列表数据
 	 */
     public ResponseEntity<String> jobinfoList(int start, int length, int jobGroup, 
@@ -231,7 +231,7 @@ public class XxlJobTemplate {
         return response;
     }
 
-	/**
+	/*
 	 * 添加任务信息
 	 *
 	 * @param xxlJobModel 任务信息实体
@@ -268,7 +268,7 @@ public class XxlJobTemplate {
 	}
 
 	 
-	/**
+	/*
 	 * 字符串拼接
 	 *
 	 * @param suffix
