@@ -15,43 +15,23 @@
  */
 package com.xxl.job.spring.boot;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.xxl.job.spring.boot.model.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.spring.boot.dto.MapUtil;
-import com.xxl.job.spring.boot.dto.XxlJobGroup;
-import com.xxl.job.spring.boot.dto.XxlJobInfo;
-import com.xxl.job.spring.boot.dto.XxlJobModel;
 
 public class XxlJobTemplate {
 	
-	private static String XXL_RPC_ACCESS_TOKEN = "XXL-RPC-ACCESS-TOKEN";
-    private static String JOBGROUP_SAVE = "/jobgroup/save";
-    private static String JOBGROUP_SAVE_UPDATE = "/jobgroup/saveOrUpdate";
-    private static String JOBGROUP_UPDATE = "/jobgroup/update";
-    private static String JOBGROUP_REMOVE = "/jobgroup/remove";
-    private static String JOBGROUP_GET = "/jobgroup/loadById";
-    
-    private static String JOBINFO_PAGELIST = "/jobinfo/pageList";
-	private static String JOBINFO_ADD = "/jobinfo/add";
-	private static String JOBINFO_ADD_UPDATE = "/jobinfo/addOrUpdate";
-    private static String JOBINFO_UPDATE = "/jobinfo/update";
-    private static String JOBINFO_REMOVE = "/jobinfo/remove";
-    private static String JOBINFO_STOP = "/jobinfo/stop";
-    private static String JOBINFO_START = "/jobinfo/start";
-    private static String JOBINFO_TRIGGER = "/jobinfo/trigger";
+
 
 	protected RestTemplate restTemplate;
 	protected XxlJobProperties properties;
@@ -66,208 +46,317 @@ public class XxlJobTemplate {
 		this.adminProperties = adminProperties;
 		this.executorProperties = executorProperties;
 	}
-	
-	/*
+
+	/**
 	 * 获取xxl-job 执行器列表数据
-	 */
-    public ResponseEntity<String> jobinfoList(int start, int length, int jobGroup, 
-			int triggerStatus) {
-    	return this.jobinfoList(start, length, jobGroup, triggerStatus, "", "", "");
-	}
-	
-	/*
-	 * 获取xxl-job 执行器列表数据
-	 */
-    public ResponseEntity<String> jobinfoList(int start, int length, int jobGroup, 
-			int triggerStatus, String jobDesc, String executorHandler, String author) {
-
-		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-
-		params.put("start", Collections.singletonList(Math.max(0, start)));
-		params.put("length", Collections.singletonList(Math.min(length, 5)));
-		params.put("jobGroup", Collections.singletonList(jobGroup));
-		params.put("triggerStatus", Collections.singletonList(triggerStatus));
-		params.put("jobDesc", Collections.singletonList(jobDesc));
-		params.put("executorHandler", Collections.singletonList(executorHandler));
-		params.put("author", Collections.singletonList(author));
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_PAGELIST),
-				request, String.class);
-		
-		return response;
-		  
-	}
-    
-    public ResponseEntity<String> addJob(XxlJobInfo xxlJobInfo) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD), request, String.class);
-        return response;
-    }
-    
-    public ResponseEntity<String> addJobOrUpdate(XxlJobInfo xxlJobInfo) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_ADD_UPDATE), request, String.class);
-        return response;
-    }
-
-    public ResponseEntity<String> updateJob(XxlJobInfo xxlJobInfo) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_UPDATE), request, String.class);
-        return response;
-    }
-
-    public ResponseEntity<String> removeJob(int jobInfoId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_REMOVE), request, String.class);
-        return response;
-    }
-    
-    public ResponseEntity<String> stopJob(int jobInfoId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_STOP), request, String.class);
-        return response;
-    }
-    
-    public ResponseEntity<String> startJob(int jobInfoId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_START), request, String.class);
-        return response;
-    }
-    
-    public ResponseEntity<String> triggerJob(int jobInfoId, String executorParam) {
-    	
-    	MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-
-	    paramMap.put("id", Collections.singletonList(String.valueOf(jobInfoId)));
-		paramMap.put("executorParam", Collections.singletonList(executorParam));
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(paramMap, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBINFO_TRIGGER), request, String.class);
-        return response;
-    }
-
-	public ResponseEntity<String> addGroup(XxlJobGroup xxlJobGroup) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-		MultiValueMap<String, String> xxlJobGroupMap = MapUtil.obj2Map(xxlJobGroup);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobGroupMap, headers);
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_SAVE), request, String.class);
-		
-		return response;
-	}
-
-	public ResponseEntity<String> addOrUpdateGroup(XxlJobGroup xxlJobGroup) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-		MultiValueMap<String, String> xxlJobGroupMap = MapUtil.obj2Map(xxlJobGroup);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobGroupMap, headers);
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_SAVE_UPDATE), request, String.class);
-		
-		return response;
-	}
-	
-	public ResponseEntity<String> updateGroup(XxlJobGroup xxlJobGroup) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-		MultiValueMap<String, String> xxlJobGroupMap = MapUtil.obj2Map(xxlJobGroup);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobGroupMap, headers);
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_UPDATE), request, String.class);
-		
-		return response;
-	}
-	
-    public ResponseEntity<String> removeGroup(int jobGroupId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        HttpEntity<Integer> request = new HttpEntity<Integer>(jobGroupId, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_REMOVE), request, String.class);
-        return response;
-    }
-    
-    public ResponseEntity<String> getGroup(int jobGroupId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add(XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
-        HttpEntity<Integer> request = new HttpEntity<Integer>(jobGroupId, headers);
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(JOBGROUP_GET), request, String.class);
-        return response;
-    }
-
-	/*
-	 * 添加任务信息
-	 *
-	 * @param xxlJobModel 任务信息实体
-	 * @param jobGroup    执行器编号
+	 * @param start	起始位置
+	 * @param length 数量
+	 * @param jobGroup 执行器主键ID
+	 * @param triggerStatus 调度状态：0-停止，1-运行
 	 * @return
-	 * @throws UnsupportedEncodingException
-	 * @throws HttpProcessException
 	 */
-    public ReturnT<String> addJobInfo(XxlJobModel xxlJobModel, int jobGroup) throws UnsupportedEncodingException {
-
-		Map<String, Object> params = new HashMap<>();
-
-		params.put("jobGroup", jobGroup);
-		params.put("jobDesc", URLEncoder.encode(xxlJobModel.getJobDesc(), "UTF-8"));
-		params.put("executorRouteStrategy", "FIRST");
-		params.put("executorBlockStrategy", "SERIAL_EXECUTION");
-		params.put("jobCron", URLEncoder.encode(xxlJobModel.getJobCron(), "utf-8"));
-
-		params.put("glueType", "BEAN");
-		params.put("executorHandler", xxlJobModel.getExecutorHandlerName());
-		params.put("childJobId", "");
-		params.put("executorTimeout", "30");
-		params.put("executorFailRetryCount", "3");
-		params.put("author", xxlJobModel.getAuthor());
-		params.put("alarmEmail", "");
-		params.put("executorParam", "");
-		params.put("glueRemark", URLEncoder.encode("GLUE代码初始化", "UTF-8"));
-		params.put("glueSource", "");
-
-		ReturnT<String> returnT = null;
- 
-
-		return returnT;
+	public ReturnT<XxlJobGroupList> jobInfoGroupList(int start, int length, String appname, String title) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(7);
+		paramMap.put("start", Math.max(0, start));
+		paramMap.put("length", Math.min(length, 5));
+		paramMap.put("appname", appname);
+		paramMap.put("title", title);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_PAGELIST), request, String.class);
+		// xxl-job admin 请求结果成功
+		if(response.getStatusCode().is2xxSuccessful()) {
+			return new ReturnT<XxlJobGroupList>(ReturnT.FAIL_CODE, JSON.parseObject(response.getBody(), new TypeReference<XxlJobGroupList>() {
+			}));
+		}
+		// xxl-job admin 请求结果失败
+		return new ReturnT<XxlJobGroupList>(ReturnT.FAIL_CODE, response.toString());
 	}
 
-	 
+	/**
+	 * 获取调度任务组
+	 * @param jobGroupId 调度任务组ID
+	 * @return ReturnT
+	 */
+	public ReturnT<XxlJobGroup> jobInfoGroup(Integer jobGroupId) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(1);
+		paramMap.put("id", jobGroupId);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_GET), request, String.class);
+		// xxl-job admin 请求结果成功
+		if(response.getStatusCode().is2xxSuccessful()) {
+			return JSON.parseObject(response.getBody(), new TypeReference<ReturnT<XxlJobGroup>>() {
+			});
+		}
+		// xxl-job admin 请求结果失败
+		return new ReturnT<XxlJobGroup>(ReturnT.FAIL_CODE, response.toString());
+	}
+
+	/**
+	 * 添加调度任务组
+	 * @param jobGroup 调度任务组信息Model
+	 * @return	ReturnT
+	 */
+	public ReturnT<String> addJobGroup(XxlJobGroup jobGroup) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobGroup), Map.class);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_SAVE), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+	}
+
+	/**
+	 * 更新调度任务组
+	 * @param jobGroup 调度任务组信息Model
+	 * @return ReturnT
+	 */
+	public ReturnT<String> updateJobGroup(XxlJobGroup jobGroup) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobGroup), Map.class);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_UPDATE), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+	}
+
+	/**
+	 * 删除调度任务组
+	 * @param jobGroupId 调度任务组ID
+	 * @return	ReturnT
+	 */
+	public ReturnT<String> removeJobGroup(Integer jobGroupId) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(1);
+		paramMap.put("id", jobGroupId);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_REMOVE), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+	}
+
+	/**
+	 * 获取xxl-job 执行器列表数据
+	 * @param start	起始位置
+	 * @param length 数量
+	 * @param jobGroup 执行器主键ID
+	 * @return
+	 */
+	public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup) {
+		return this.jobInfoList(start, length, jobGroup, -1, "", "", "");
+	}
+
+	/**
+	 * 获取xxl-job 执行器列表数据
+	 * @param start	起始位置
+	 * @param length 数量
+	 * @param jobGroup 执行器主键ID
+	 * @param triggerStatus 调度状态：0-停止，1-运行
+	 * @return
+	 */
+    public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup, int triggerStatus) {
+    	return this.jobInfoList(start, length, jobGroup, triggerStatus, "", "", "");
+	}
+
+	/**
+	 * 获取xxl-job 执行器列表数据
+	 * @param start
+	 * @param length
+	 * @param jobGroup
+	 * @param triggerStatus
+	 * @param jobDesc
+	 * @param executorHandler
+	 * @param author
+	 * @return
+	 */
+    public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup,
+			int triggerStatus, String jobDesc, String executorHandler, String author) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(7);
+		paramMap.put("start", Math.max(0, start));
+		paramMap.put("length", Math.min(length, 5));
+		paramMap.put("jobGroup", jobGroup);
+		paramMap.put("triggerStatus", triggerStatus);
+		paramMap.put("jobDesc", jobDesc);
+		paramMap.put("executorHandler", executorHandler);
+		paramMap.put("author", author);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_PAGELIST), request, String.class);
+		// xxl-job admin 请求结果成功
+		if(response.getStatusCode().is2xxSuccessful()) {
+			return new ReturnT<XxlJobInfoList>(ReturnT.FAIL_CODE, JSON.parseObject(response.getBody(), new TypeReference<XxlJobInfoList>() {
+			}));
+		}
+		// xxl-job admin 请求结果失败
+		return new ReturnT<XxlJobInfoList>(ReturnT.FAIL_CODE, response.toString());
+	}
+
+	/**
+	 * 新增调度任务
+	 * @param jobInfo 调用任务信息Model
+	 * @return 任务id
+	 * @return
+	 */
+	public ReturnT<Integer> addJob(XxlJobInfo jobInfo) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobInfo), Map.class);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_ADD), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity2(response);
+    }
+    
+    /*public ResponseEntity<String> addJobOrUpdate(XxlJobInfo xxlJobInfo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(XxlJobConstants.XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
+        MultiValueMap<String, String> xxlJobInfoMap = MapUtil.obj2Map(xxlJobInfo);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(xxlJobInfoMap, headers);
+        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_ADD_UPDATE), request, String.class);
+        return response;
+    }*/
+
+	/**
+	 * 修改调度任务
+	 * @param jobInfo 调用任务信息Model
+	 * @return
+	 */
+    public ReturnT<String> updateJob(XxlJobInfo jobInfo) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobInfo), Map.class);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_UPDATE), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+    }
+
+	/**
+	 * 删除调度任务
+	 * @param jobId 任务id
+	 * @return
+	 */
+    public ReturnT<String> removeJob(Integer jobId) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(1);
+		paramMap.put("id", jobId);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_REMOVE), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+    }
+
+	/**
+	 * 停止调度
+	 * @param jobId 任务id
+	 * @return
+	 */
+    public ReturnT<String> stopJob(Integer jobId) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(1);
+		paramMap.put("id", jobId);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_STOP), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+    }
+
+	/**
+	 * 开启调度
+	 * @param jobId 任务id
+	 * @return
+	 */
+	public ReturnT<String> startJob(Integer jobId) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(1);
+		paramMap.put("id", jobId);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_START), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+    }
+
+	/**
+	 *
+	 * 手动触发一次调度
+	 * @param jobInfo 调用任务信息Model
+	 * @return ReturnT
+	 */
+	public ReturnT<String> triggerJob(XxlJobInfo jobInfo) {
+		return this.triggerJob(jobInfo.getId(), jobInfo.getExecutorParam());
+	}
+
+	/**
+	 * 手动触发一次调度
+	 * @param jobInfoId 调用任务ID
+	 * @param executorParam 执行器参数
+	 * @return ReturnT
+	 */
+    public ReturnT<String> triggerJob(Integer jobInfoId, String executorParam) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(2);
+		paramMap.put("id", jobInfoId);
+		paramMap.put("executorParam", executorParam);
+		// xxl-job admin 请求体
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap);
+		// xxl-job admin 请求操作
+        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_TRIGGER), request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
+    }
+
+
+	private HttpEntity<Map<String, Object>> buildRequestEntity(Map<String, Object> paramMap) {
+		// xxl-job admin 请求头
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add(XxlJobConstants.XXL_RPC_ACCESS_TOKEN, properties.getAccessToken());
+		HttpEntity<Map<String, Object>> requestBody = new HttpEntity<>(paramMap, headers);
+		return requestBody;
+	}
+
+	private ReturnT<String> parseResponseEntity(ResponseEntity<String> response){
+		// xxl-job admin 请求结果成功
+		if(response.getStatusCode().is2xxSuccessful()) {
+			return JSON.parseObject(response.getBody(), new TypeReference<ReturnT<String>>() {
+			});
+		}
+		// xxl-job admin 请求结果失败
+		return new ReturnT<String>(ReturnT.FAIL_CODE, response.toString());
+	}
+
+	private ReturnT<Integer> parseResponseEntity2(ResponseEntity<String> response){
+		// xxl-job admin 请求结果成功
+		if(response.getStatusCode().is2xxSuccessful()) {
+			return JSON.parseObject(response.getBody(), new TypeReference<ReturnT<Integer>>() {
+			});
+		}
+		// xxl-job admin 请求结果失败
+		return new ReturnT<Integer>(ReturnT.FAIL_CODE, response.toString());
+	}
+
 	/*
 	 * 字符串拼接
 	 *

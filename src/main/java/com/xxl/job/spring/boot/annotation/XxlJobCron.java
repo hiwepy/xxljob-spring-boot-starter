@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.spring.boot.ExecutorRouteStrategyEnum;
+import com.xxl.job.spring.boot.executor.ExecutorRouteStrategyEnum;
 
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
