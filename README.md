@@ -4,8 +4,7 @@ xxljob-spring-boot-starter
 #### 组件简介
 
 - 基于 [xxljob ](https://github.com/xuxueli/xxl-job/) 的API封装，提供了更加简单的使用方式
-- 客户端自动注册任务
-- 该客户端需要基于修改后的xxl-job [jeebiz-xxljob ](https://github.com/Jeebiz/jeebiz-xxljob) 作为服务端，才可以使用
+- 通过 @XxlJobCron 注解，自动注册定时任务，无需手动添加
 
 #### 使用说明
 
@@ -76,6 +75,7 @@ import com.xxl.job.spring.boot.annotation.XxlJobCron;
  */
 @Component
 public class SampleXxlJob {
+    
     private static Logger logger = LoggerFactory.getLogger(SampleXxlJob.class);
 
 
