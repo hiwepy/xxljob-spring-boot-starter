@@ -8,6 +8,9 @@ public class XxlJobConstants {
     private XxlJobConstants() {
     }
 
+    public static final String XXL_RPC_COOKIE = "XXL_JOB_LOGIN_IDENTITY";
+    public static final String XXL_RPC_ACCESS_TOKEN = "XXL-RPC-ACCESS-TOKEN";
+
     /**
      * 任务调度平台默认跨平台Http任务处理器
      */
@@ -19,7 +22,10 @@ public class XxlJobConstants {
     public static final String DEFAULT_GLUE_TYPE = "BEAN";
 
 
-    public static final String XXL_RPC_ACCESS_TOKEN = "XXL-RPC-ACCESS-TOKEN";
+    /**
+     * 任务调度平台API-登录
+     */
+    public static final String LOGIN_GET = "/login";
 
     /**
      * 任务调度平台API-任务组列表

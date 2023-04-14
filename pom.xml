@@ -417,6 +417,11 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+		</dependency>
+
 		<!-- Core starter, including auto-configuration support, logging and YAML -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
