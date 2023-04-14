@@ -79,8 +79,8 @@ public class XxlJobTemplate {
 	 * 获取xxl-job 执行器列表数据
 	 * @param start	起始位置
 	 * @param length 数量
-	 * @param jobGroup 执行器主键ID
-	 * @param triggerStatus 调度状态：0-停止，1-运行
+	 * @param appname 执行器名称
+	 * @param title 执行器标题
 	 * @return
 	 */
 	public ReturnT<XxlJobGroupList> jobInfoGroupList(int start, int length, String appname, String title) {
