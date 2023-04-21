@@ -28,6 +28,11 @@ public class XxlJobConstants {
     public static final String LOGIN_GET = "/login";
 
     /**
+     * 任务调度平台API-注销
+     */
+    public static final String LOGOUT_GET = "/logout";
+
+    /**
      * 任务调度平台API-任务组列表
      */
     public static final String JOBGROUP_PAGELIST = "/jobgroup/pageList";

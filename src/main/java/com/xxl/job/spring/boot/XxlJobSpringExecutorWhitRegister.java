@@ -48,7 +48,6 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(XxlJobSpringExecutorWhitRegister.class);
 	private final XxlJobTemplate xxlJobTemplate;
-	private boolean autoStartJob = Boolean.FALSE;
     private String appname;
 	private List<XxlJobInfo> cacheJobs = new ArrayList<>();
 	private Random RANDOM_ORDER = new Random(10);
@@ -62,10 +61,6 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 		super.setAppname(appname);
 		this.appname = appname;
 	}
-
-    public void setAutoStartJob(boolean autoStartJob) {
-        this.autoStartJob = autoStartJob;
-    }
 
     // start
     @Override
@@ -131,6 +126,9 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
                 registJobHandler(xxlJob, bean, executeMethod);
                 registJobHandlerCronTask(xxlJob, bean, executeMethod);
             }
+
+            registJobHandlerCronTaskTOAdmin();
+
         }
     }
     
@@ -161,11 +159,8 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         
     }
 
+    public void registJobHandlerCronTaskTOAdmin() {
 
-    @Override
-    public void start() throws Exception {
-        // 调用默认的启动方法
-        super.start();
         // 检查执行器是否存在
         if(!StringUtils.hasText(appname)) {
             return;

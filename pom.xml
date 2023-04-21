@@ -372,6 +372,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<caffeine.version>2.9.3</caffeine.version>
 		<fastjson.version>2.0.10</fastjson.version>
 		<okhttp3.version>3.14.9</okhttp3.version>
 		<xxljob.version>2.4.0</xxljob.version>
@@ -398,6 +399,12 @@
 			    <groupId>com.xuxueli</groupId>
 			    <artifactId>xxl-job-core</artifactId>
 			    <version>${xxljob.version}</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+			<dependency>
+				<groupId>com.github.ben-manes.caffeine</groupId>
+				<artifactId>caffeine</artifactId>
+				<version>${caffeine.version}</version>
 			</dependency>
 
 		</dependencies>
@@ -455,7 +462,6 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 		</dependency>
-
 		<dependency>
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>fastjson</artifactId>
@@ -463,6 +469,15 @@
 		<dependency>
 		    <groupId>com.xuxueli</groupId>
 		    <artifactId>xxl-job-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+		</dependency>
+		<!-- For Web -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
 	</dependencies>

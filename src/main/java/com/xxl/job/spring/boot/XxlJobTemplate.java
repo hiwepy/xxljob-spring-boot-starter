@@ -15,19 +15,23 @@
  */
 package com.xxl.job.spring.boot;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.xxl.job.spring.boot.model.*;
 import lombok.extern.slf4j.Slf4j;
-import javax.servlet.http.Cookie;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.xxl.job.core.biz.model.ReturnT;
@@ -39,32 +43,7 @@ public class XxlJobTemplate {
 	protected XxlJobProperties properties;
 	protected XxlJobAdminProperties adminProperties;
 	protected XxlJobExecutorProperties executorProperties;
-
-	protected Function<HttpEntity<Map<String, Object>>, ReturnT<String>> loginHandler = (request) -> {
-		// xxl-job admin 请求参数
-		Map<String, Object> paramMap = new HashMap<>(2);
-		paramMap.put("userName", adminProperties.getUsername());
-		paramMap.put("password", adminProperties.getPassword());
-		paramMap.put("ifRemember", adminProperties.isRemember() ? "on" : "off");
-		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> loginRequest = this.buildRequestEntity(paramMap);
-		// xxl-job admin 请求操作
-		ResponseEntity<String> loginResponse = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.LOGIN_GET), loginRequest, String.class);
-		// xxl-job admin 请求结果成功
-		if(loginResponse.getStatusCode().is2xxSuccessful()) {
-			log.info("xxl-job login success.");
-			String cookie = loginResponse.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
-			log.info("xxl-job cookie {}.", cookie);
-			// 将cookie存入头部
-			request.getHeaders().set(HttpHeaders.COOKIE, cookie);
-			// 返回cookie
-			return new ReturnT<String>(ReturnT.SUCCESS_CODE, cookie);
-		}
-		// xxl-job admin 请求结果失败
-		log.error("xxl-job login fail.");
-		// 返回失败
-		return new ReturnT<String>(ReturnT.FAIL_CODE, loginResponse.toString());
-	};
+	protected Cache<String, ReturnT<String>> cookieCache;
 
 	public XxlJobTemplate( RestTemplate restTemplate, XxlJobProperties properties, 
 			XxlJobAdminProperties adminProperties, 
@@ -73,6 +52,55 @@ public class XxlJobTemplate {
 		this.properties = properties;
 		this.adminProperties = adminProperties;
 		this.executorProperties = executorProperties;
+		this.cookieCache = Caffeine.newBuilder()
+				.maximumSize(adminProperties.getCookieCache().getMaximumSize())
+				.expireAfterWrite(adminProperties.getCookieCache().getExpireAfterWrite())
+				//.refreshAfterWrite(adminProperties.getCookieCache().getRefreshAfterWrite())
+				.build();
+	}
+
+	public ReturnT<String> login(String userName, String password, boolean remember) {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = new HashMap<>(2);
+		paramMap.put("userName", userName);
+		paramMap.put("password", password);
+		paramMap.put("ifRemember", remember ? "on" : "off");
+		// xxl-job admin 请求体
+		String url = this.joinPath(XxlJobConstants.LOGIN_GET);
+		HttpEntity<Map<String, Object>> loginRequest = this.buildRequestEntity(url, paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, loginRequest, String.class);
+		// xxl-job admin 请求结果成功
+		if(response.getStatusCode().is2xxSuccessful()) {
+			log.info("xxl-job login success.");
+			ReturnT<String> returnT = JSON.parseObject(response.getBody(), new TypeReference<ReturnT<String>>() {});
+			returnT.setCode(ReturnT.SUCCESS_CODE);
+			// 从返回结果中获取cookie
+			String cookie = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+			log.info("xxl-job cookie {}.", cookie);
+			// 返回cookie
+			return new ReturnT<String>(ReturnT.SUCCESS_CODE, cookie);
+		}
+		// xxl-job admin 请求结果失败
+		log.error("xxl-job login fail.");
+		// xxl-job admin 请求结果失败
+		return new ReturnT<String>(ReturnT.FAIL_CODE, response.toString());
+	}
+
+	/**
+	 * 退出登录
+	 * @return
+	 */
+	public ReturnT<String> logout() {
+		// xxl-job admin 请求参数
+		Map<String, Object> paramMap = Collections.emptyMap();
+		// xxl-job admin 请求体
+		String url = this.joinPath(XxlJobConstants.LOGOUT_GET);
+		HttpEntity<Map<String, Object>> loginRequest = this.buildRequestEntity(url, paramMap);
+		// xxl-job admin 请求操作
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, loginRequest, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
 	}
 
 	/**
@@ -91,16 +119,12 @@ public class XxlJobTemplate {
 		paramMap.put("appname", appname);
 		paramMap.put("title", title);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBGROUP_PAGELIST);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_PAGELIST), request, String.class);
-		// xxl-job admin 请求结果成功
-		if(response.getStatusCode().is2xxSuccessful()) {
-			return new ReturnT<XxlJobGroupList>(ReturnT.SUCCESS_CODE, JSON.parseObject(response.getBody(), new TypeReference<XxlJobGroupList>() {
-			}));
-		}
-		// xxl-job admin 请求结果失败
-		return new ReturnT<XxlJobGroupList>(ReturnT.FAIL_CODE, response.toString());
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
 	}
 
 	/**
@@ -113,16 +137,12 @@ public class XxlJobTemplate {
 		Map<String, Object> paramMap = new HashMap<>(1);
 		paramMap.put("id", jobGroupId);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBGROUP_GET);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_GET), request, String.class);
-		// xxl-job admin 请求结果成功
-		if(response.getStatusCode().is2xxSuccessful()) {
-			return new ReturnT<XxlJobGroup>(ReturnT.SUCCESS_CODE, JSON.parseObject(response.getBody(), new TypeReference<ReturnT<XxlJobGroup>>() {
-			}));
-		}
-		// xxl-job admin 请求结果失败
-		return new ReturnT<XxlJobGroup>(ReturnT.FAIL_CODE, response.toString());
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
 	}
 
 	/**
@@ -134,9 +154,10 @@ public class XxlJobTemplate {
 		// xxl-job admin 请求参数
 		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobGroup), Map.class);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBGROUP_SAVE);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_SAVE), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
 	}
@@ -150,9 +171,10 @@ public class XxlJobTemplate {
 		// xxl-job admin 请求参数
 		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobGroup), Map.class);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBGROUP_UPDATE);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_UPDATE), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
 	}
@@ -167,9 +189,10 @@ public class XxlJobTemplate {
 		Map<String, Object> paramMap = new HashMap<>(1);
 		paramMap.put("id", jobGroupId);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBGROUP_REMOVE);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBGROUP_REMOVE), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
 	}
@@ -220,16 +243,12 @@ public class XxlJobTemplate {
 		paramMap.put("executorHandler", executorHandler);
 		paramMap.put("author", author);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_PAGELIST);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_PAGELIST), request, String.class);
-		// xxl-job admin 请求结果成功
-		if(response.getStatusCode().is2xxSuccessful()) {
-			return new ReturnT<XxlJobInfoList>(ReturnT.SUCCESS_CODE, JSON.parseObject(response.getBody(), new TypeReference<XxlJobInfoList>() {
-			}));
-		}
-		// xxl-job admin 请求结果失败
-		return new ReturnT<XxlJobInfoList>(ReturnT.FAIL_CODE, response.toString());
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
+		// xxl-job admin 请求结果处理
+		return this.parseResponseEntity(response);
 	}
 
 	/**
@@ -242,11 +261,12 @@ public class XxlJobTemplate {
 		// xxl-job admin 请求参数
 		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobInfo), Map.class);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_ADD);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_ADD), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
-		return this.parseResponseEntity2(response);
+		return this.parseResponseEntity(response);
     }
     
     /*public ResponseEntity<String> addJobOrUpdate(XxlJobInfo xxlJobInfo) {
@@ -268,9 +288,10 @@ public class XxlJobTemplate {
 		// xxl-job admin 请求参数
 		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobInfo), Map.class);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_UPDATE);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_UPDATE), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
     }
@@ -285,9 +306,10 @@ public class XxlJobTemplate {
 		Map<String, Object> paramMap = new HashMap<>(1);
 		paramMap.put("id", jobId);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_REMOVE);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url,paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_REMOVE), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
     }
@@ -302,9 +324,10 @@ public class XxlJobTemplate {
 		Map<String, Object> paramMap = new HashMap<>(1);
 		paramMap.put("id", jobId);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_STOP);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_STOP), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
     }
@@ -319,9 +342,10 @@ public class XxlJobTemplate {
 		Map<String, Object> paramMap = new HashMap<>(1);
 		paramMap.put("id", jobId);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_START);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-		ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_START), request, String.class);
+		ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
     }
@@ -348,19 +372,20 @@ public class XxlJobTemplate {
 		paramMap.put("id", jobInfoId);
 		paramMap.put("executorParam", executorParam);
 		// xxl-job admin 请求体
-		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(paramMap, true);
+		String url = this.joinPath(XxlJobConstants.JOBINFO_TRIGGER);
+		HttpEntity<Map<String, Object>> request = this.buildRequestEntity(url, paramMap, true);
 		// xxl-job admin 请求操作
-        ResponseEntity<String> response = this.restTemplate.postForEntity(this.joinPath(XxlJobConstants.JOBINFO_TRIGGER), request, String.class);
+        ResponseEntity<String> response = this.restTemplate.postForEntity(url, request, String.class);
 		// xxl-job admin 请求结果处理
 		return this.parseResponseEntity(response);
     }
 
 
-	private HttpEntity<Map<String, Object>> buildRequestEntity(Map<String, Object> paramMap) {
-		return this.buildRequestEntity(paramMap, false);
+	private HttpEntity<Map<String, Object>> buildRequestEntity(String url, Map<String, Object> paramMap) {
+		return this.buildRequestEntity(url, paramMap, false);
 	}
 	
-	private HttpEntity<Map<String, Object>> buildRequestEntity(Map<String, Object> paramMap, boolean useCookie) {
+	private HttpEntity<Map<String, Object>> buildRequestEntity(String url, Map<String, Object> paramMap, boolean loginIfNeed) {
 		// xxl-job admin 请求头
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -368,33 +393,35 @@ public class XxlJobTemplate {
 		// xxl-job admin 请求体
 		HttpEntity<Map<String, Object>> request = new HttpEntity<>(paramMap, headers);
 		// xxl-job admin cookie
-		if(useCookie){
-			ReturnT<String> loginRst = loginHandler.apply(request);
-			if(loginRst.getCode() == ReturnT.SUCCESS_CODE){
-				headers.add(XxlJobConstants.XXL_RPC_COOKIE, loginRst.getContent());
-			}
+		if(loginIfNeed){
+			this.loginIfNeed(url, headers, request);
 		}
 		return request;
 	}
 
-	private ReturnT<String> parseResponseEntity(ResponseEntity<String> response){
-		// xxl-job admin 请求结果成功
-		if(response.getStatusCode().is2xxSuccessful()) {
-			return JSON.parseObject(response.getBody(), new TypeReference<ReturnT<String>>() {
-			});
-		}
-		// xxl-job admin 请求结果失败
-		return new ReturnT<String>(ReturnT.FAIL_CODE, response.toString());
+	private ReturnT<String> loginIfNeed(String url, HttpHeaders headers, HttpEntity<Map<String, Object>> request) {
+		// xxl-job admin 登录操作
+		return cookieCache.get(url, (key) -> {
+			// xxl-job admin 登录操作
+			ReturnT<String> loginRst = this.login(adminProperties.getUsername(), adminProperties.getPassword(), adminProperties.isRemember());
+ 			if(loginRst.getCode() == ReturnT.SUCCESS_CODE){
+				headers.add(XxlJobConstants.XXL_RPC_COOKIE, loginRst.getContent());
+			}
+			return loginRst;
+		});
 	}
 
-	private ReturnT<Integer> parseResponseEntity2(ResponseEntity<String> response){
+	private <T> ReturnT<T> parseResponseEntity(ResponseEntity<String> response){
 		// xxl-job admin 请求结果成功
 		if(response.getStatusCode().is2xxSuccessful()) {
-			return JSON.parseObject(response.getBody(), new TypeReference<ReturnT<Integer>>() {
-			});
+			log.error("xxl-job request successful.");
+			ReturnT<T> returnT = JSON.parseObject(response.getBody(), new TypeReference<ReturnT<T>>() {});
+			returnT.setCode(ReturnT.SUCCESS_CODE);
+			return returnT;
 		}
+		log.error("xxl-job request fail.");
 		// xxl-job admin 请求结果失败
-		return new ReturnT<Integer>(ReturnT.FAIL_CODE, response.toString());
+		return new ReturnT<T>(ReturnT.FAIL_CODE, response.toString());
 	}
 
 	/*

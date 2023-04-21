@@ -15,16 +15,17 @@
  */
 package com.xxl.job.spring.boot;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Duration;
+
 @ConfigurationProperties(XxlJobAdminProperties.PREFIX)
-@Getter
-@Setter
-@ToString
+@Data
 public class XxlJobAdminProperties {
 
 	public static final String PREFIX = "xxl.job.admin";
@@ -48,5 +49,29 @@ public class XxlJobAdminProperties {
 	 * 调度中心登录状态保持，开启后xxl-job登录状态不过期，默认：2H
 	 */
 	private boolean remember;
+
+	/**
+	 * 调度中心登录状态Cookie缓存配置
+	 */
+	private XxlJobAdminCookieProperties cookieCache;
+
+	@Data
+	public static class XxlJobAdminCookieProperties {
+
+		/**
+		 * he maximum size of the cache
+		 */
+		private long maximumSize = 10_000;
+		/**
+		 * the length of time after an entry is created that it should be automatically removed
+		 */
+		private Duration expireAfterWrite = Duration.ofMinutes(5);
+		/**
+		 * the length of time after an entry is created that it should be considered stale, and thus eligible for refresh
+		 */
+		private Duration refreshAfterWrite = Duration.ofMinutes(1);
+
+	}
+
 
 }
