@@ -133,7 +133,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
                 registJobHandlerCronTask(xxlJob, bean, executeMethod);
             }
 
-            registJobHandlerCronTaskTOAdmin();
+            registJobHandlerCronTaskToAdmin();
 
         }
     }
@@ -146,6 +146,10 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         }
 
         XxlJobCron xxlJobCron = AnnotationUtils.findAnnotation(executeMethod, XxlJobCron.class);
+
+        if(Objects.isNull(xxlJobCron)) {
+        	return;
+        }
 
         XxlJobInfo xxlJobInfo = new XxlJobInfo();
 
@@ -179,7 +183,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         
     }
 
-    public void registJobHandlerCronTaskTOAdmin() {
+    public void registJobHandlerCronTaskToAdmin() {
 
         // 检查执行器是否存在
         if(!StringUtils.hasText(appName)) {

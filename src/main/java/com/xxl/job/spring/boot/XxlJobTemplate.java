@@ -77,7 +77,8 @@ public class XxlJobTemplate {
 			// xxl-job admin 请求结果成功
 			if(response.isSuccessful()) {
 				log.info("xxl-job login success.");
-				ReturnT<String> returnT = JSON.parseObject(response.body().string(), new TypeReference<ReturnT<String>>() {});
+				String body = response.body().string();
+				ReturnT<String> returnT = JSON.parseObject(body, new TypeReference<ReturnT<String>>() {});
 				returnT.setCode(ReturnT.SUCCESS_CODE);
 				// 从返回结果中获取cookie
 				String cookie = response.header(HttpHeaders.SET_COOKIE);
