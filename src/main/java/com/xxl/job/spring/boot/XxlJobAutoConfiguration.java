@@ -2,8 +2,14 @@ package com.xxl.job.spring.boot;
 
 import javax.annotation.PostConstruct;
 
+import com.xxl.job.spring.boot.cache.CaffeineCacheCookieJar;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,11 +22,16 @@ import org.springframework.web.client.RestTemplate;
 import com.xxl.job.core.executor.XxlJobExecutor;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 @Configuration
 @ConditionalOnClass(XxlJobExecutor.class)
 @ConditionalOnProperty(prefix = XxlJobProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties({
 	XxlJobAdminProperties.class,
+	XxlJobAdminCookieProperties.class,
 	XxlJobProperties.class,
 	XxlJobExecutorProperties.class
 })
@@ -35,10 +46,16 @@ public class XxlJobAutoConfiguration {
 	}
 	
 	@Bean
-	public XxlJobTemplate xxlJobTemplate(RestTemplate restTemplate, XxlJobProperties properties,
-			XxlJobAdminProperties adminProperties, 
+	public XxlJobTemplate xxlJobTemplate(
+			ObjectProvider<OkHttpClient> okhttp3ClientProvider,
+			ObjectProvider<CookieJar> cookieJarProvider,
+			XxlJobProperties properties,
+			XxlJobAdminProperties adminProperties,
+			XxlJobAdminCookieProperties cookieProperties,
 			XxlJobExecutorProperties executorProperties) throws Exception {
-		return new XxlJobTemplate(restTemplate, properties, adminProperties, executorProperties);
+		OkHttpClient okhttp3Client = okhttp3ClientProvider.getIfAvailable(() -> new OkHttpClient.Builder()
+				.cookieJar(new CaffeineCacheCookieJar(cookieProperties.getMaximumSize(), cookieProperties.getExpireAfterWrite(), cookieProperties.getExpireAfterAccess())).build());
+		return new XxlJobTemplate(okhttp3Client, properties, adminProperties, executorProperties);
 	}
 	
 	@Bean
@@ -52,6 +69,7 @@ public class XxlJobAutoConfiguration {
 		XxlJobSpringExecutorWhitRegister xxlJobExecutor = new XxlJobSpringExecutorWhitRegister(xxlJobTemplate);
 		xxlJobExecutor.setAdminAddresses(adminProperties.getAddresses());
 		xxlJobExecutor.setAppname(executorProperties.getAppname());
+		xxlJobExecutor.setAppTitle(executorProperties.getTitle());
 		xxlJobExecutor.setIp(executorProperties.getIp());
 		xxlJobExecutor.setPort(Integer.parseInt(executorProperties.getPort()));
 		xxlJobExecutor.setAccessToken(properties.getAccessToken());

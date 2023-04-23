@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,6 +32,7 @@ public class XxlJobGroup implements Serializable {
 
 	private int id;
 
+	@JSONField(name = "appname")
 	private String appName;
 
 	private String title;

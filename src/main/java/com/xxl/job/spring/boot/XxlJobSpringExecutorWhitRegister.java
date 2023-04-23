@@ -18,6 +18,7 @@ package com.xxl.job.spring.boot;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
 import com.xxl.job.spring.boot.model.XxlJobGroupList;
 import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.model.XxlJobInfoList;
@@ -48,7 +49,8 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(XxlJobSpringExecutorWhitRegister.class);
 	private final XxlJobTemplate xxlJobTemplate;
-    private String appname;
+    private String appName;
+    private String appTitle;
 	private List<XxlJobInfo> cacheJobs = new ArrayList<>();
 	private Random RANDOM_ORDER = new Random(10);
 	
@@ -57,10 +59,14 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	}
 
 	@Override
-	public void setAppname(String appname) {
-		super.setAppname(appname);
-		this.appname = appname;
+	public void setAppname(String appName) {
+		super.setAppname(appName);
+		this.appName = appName;
 	}
+
+    public void setAppTitle(String appTitle) {
+        this.appTitle = appTitle;
+    }
 
     // start
     @Override
@@ -142,19 +148,33 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         XxlJobCron xxlJobCron = AnnotationUtils.findAnnotation(executeMethod, XxlJobCron.class);
 
         XxlJobInfo xxlJobInfo = new XxlJobInfo();
-        
-        xxlJobInfo.setAuthor(xxlJobCron.author());
-        xxlJobInfo.setAlarmEmail(xxlJobCron.alarmEmail());
-        xxlJobInfo.setExecutorBlockStrategy(xxlJobCron.blockStrategy().name());
-        xxlJobInfo.setExecutorFailRetryCount(xxlJobCron.failRetryCount());
-        xxlJobInfo.setExecutorHandler(name);
-        xxlJobInfo.setExecutorParam(xxlJobCron.param());
-        xxlJobInfo.setExecutorRouteStrategy(xxlJobCron.routeStrategy().name());
-        xxlJobInfo.setExecutorTimeout(xxlJobCron.timeout());
-        xxlJobInfo.setGlueType(GlueTypeEnum.BEAN.name());
-        xxlJobInfo.setJobCron(xxlJobCron.cron());
+
+        // 任务描述
         xxlJobInfo.setJobDesc(xxlJobCron.desc());
-        
+        // 负责人
+        xxlJobInfo.setAuthor(xxlJobCron.author());
+        // 报警邮件
+        xxlJobInfo.setAlarmEmail(xxlJobCron.alarmEmail());
+        // 调度类型
+        xxlJobInfo.setScheduleType(ScheduleTypeEnum.CRON.name());
+        // Cron
+        xxlJobInfo.setScheduleConf(xxlJobCron.cron());
+        // 运行模式
+        xxlJobInfo.setGlueType(GlueTypeEnum.BEAN.name());
+        // JobHandler
+        xxlJobInfo.setExecutorHandler(name);
+        // 任务参数
+        xxlJobInfo.setExecutorParam(xxlJobCron.param());
+        // 路由策略
+        xxlJobInfo.setExecutorRouteStrategy(xxlJobCron.routeStrategy().name());
+        // 失败重试次数
+        xxlJobInfo.setExecutorFailRetryCount(xxlJobCron.failRetryCount());
+        // 调度过期策略
+        xxlJobInfo.setMisfireStrategy(xxlJobCron.misfireStrategy().name());
+        // 阻塞处理策略
+        xxlJobInfo.setExecutorBlockStrategy(xxlJobCron.blockStrategy().name());
+        // 任务超时时间
+        xxlJobInfo.setExecutorTimeout(xxlJobCron.timeout());
         cacheJobs.add(xxlJobInfo);
         
     }
@@ -162,80 +182,83 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
     public void registJobHandlerCronTaskTOAdmin() {
 
         // 检查执行器是否存在
-        if(!StringUtils.hasText(appname)) {
+        if(!StringUtils.hasText(appName)) {
             return;
         }
 
         // 检查任务组是否存在
-        ReturnT<XxlJobGroupList> returnT1 = getXxlJobTemplate().jobInfoGroupList(0, Integer.MAX_VALUE, appname, appname);
+        ReturnT<XxlJobGroupList> returnT1 = getXxlJobTemplate().jobInfoGroupList(0, Integer.MAX_VALUE, appName, null);
         if (returnT1.getCode() == ReturnT.FAIL_CODE) {
-            logger.error("执行器查询失败!失败原因:{}", returnT1.getMsg());
+            logger.error(">>>>>>>>>>> 执行器查询失败!失败原因:{}", returnT1.getMsg());
             return;
         }
         // 执行器不存在则创建
         XxlJobGroupList jobGroupList = returnT1.getContent();
         Integer jobGroupId = null;
         if(Objects.isNull(jobGroupList) || CollectionUtils.isEmpty(jobGroupList.getData())
-                || jobGroupList.getData().stream().noneMatch(xxlJobGroup -> xxlJobGroup.getAppName().equals(appname))) {
-            logger.info("执行器'{}'不存在，开始自动添加！", appname);
+                || jobGroupList.getData().stream().noneMatch(xxlJobGroup -> xxlJobGroup.getAppName().equals(appName))) {
+            logger.info(">>>>>>>>>>> 执行器'{}'不存在，开始自动添加！", appName);
             // 创建任务组对象
             XxlJobGroup xxlJobGroup = new XxlJobGroup();
-            xxlJobGroup.setAppName(appname);
-            //xxlJobGroup.setAddressList(addressList);
+            xxlJobGroup.setAppName(appName);
             xxlJobGroup.setAddressType(0);
             xxlJobGroup.setOrder(RANDOM_ORDER.nextInt(1000));
-            //xxlJobGroup.setRegistryList(registryList);
-            xxlJobGroup.setTitle(appname);
+            xxlJobGroup.setTitle(appTitle);
             ReturnT<String> returnT2 = getXxlJobTemplate().addJobGroup(xxlJobGroup);
             if (returnT2.getCode() == ReturnT.FAIL_CODE) {
-                logger.error( "执行器'{}'添加添加失败!失败原因:{}", appname, returnT2.getMsg());
+                logger.error( ">>>>>>>>>>> 执行器'{}'添加添加失败!失败原因:{}", appName, returnT2.getMsg());
                 return;
-            } else {
-                jobGroupId = Integer.parseInt(returnT2.getContent());
-                logger.info("执行器'{}'添加成功", appname);
             }
+            returnT1 = getXxlJobTemplate().jobInfoGroupList(0, Integer.MAX_VALUE, appName, null);
+            if (returnT1.getCode() == ReturnT.FAIL_CODE) {
+                logger.error(">>>>>>>>>>> 执行器查询失败!失败原因:{}", returnT1.getMsg());
+                return;
+            }
+            jobGroupList = returnT1.getContent();
         } else {
-            jobGroupId = jobGroupList.getData().stream().filter(xxlJobGroup -> xxlJobGroup.getAppName().equals(appname)).findFirst().get().getId();
+            jobGroupId = jobGroupList.getData().stream().filter(xxlJobGroup -> xxlJobGroup.getAppName().equals(appName)).findFirst().get().getId();
         }
+        // 定时任务是否存在
+        ReturnT<XxlJobInfoList> returnT3 = getXxlJobTemplate().jobInfoList(0, Integer.MAX_VALUE, jobGroupId);
+        if (returnT3.getCode() == ReturnT.FAIL_CODE) {
+            logger.error(">>>>>>>>>>> 定时任务查询失败!失败原因:{}", returnT3.getMsg());
+            return;
+        }
+        XxlJobInfoList jobInfoList = returnT3.getContent();
+
         // 执行器存在或者创建成功，添加定时任务
         for (XxlJobInfo xxlJobInfo : cacheJobs) {
 
-            logger.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getJobCron());
-            // 定时任务是否存在
-            ReturnT<XxlJobInfoList> returnT3 = getXxlJobTemplate().jobInfoList(0, Integer.MAX_VALUE, jobGroupId);
-            if (returnT3.getCode() == ReturnT.FAIL_CODE) {
-                logger.error("定时任务查询失败!失败原因:{}", returnT3.getMsg());
-                return;
-            }
+            logger.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getScheduleConf());
+
             xxlJobInfo.setJobGroup(jobGroupId);
-            XxlJobInfoList jobInfoList = returnT3.getContent();
             if(Objects.isNull(jobInfoList) || CollectionUtils.isEmpty(jobInfoList.getData())
                     || jobInfoList.getData().stream().noneMatch(jobInfo -> {
                         return jobInfo.getScheduleType().equals(xxlJobInfo.getScheduleType())
-                                && jobInfo.getJobCron().equals(xxlJobInfo.getJobCron())
+                                && jobInfo.getScheduleConf().equals(xxlJobInfo.getScheduleConf())
                                 && jobInfo.getGlueType().compareTo(xxlJobInfo.getGlueType()) == 0
                                 && jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())
                                 ;
             })) {
-                logger.info("不存在 ScheduleType = {}, JobCron = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
-                        xxlJobInfo.getScheduleType(), xxlJobInfo.getJobCron(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
+                logger.info(">>>>>>>>>>> 不存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
+                        xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
                 // 自动添加定时任务
                 ReturnT<Integer> returnT4 =  getXxlJobTemplate().addJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
-                    logger.error("自动添加 ScheduleType = {}, JobCron = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
-                            xxlJobInfo.getScheduleType(), xxlJobInfo.getJobCron(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
+                    logger.error(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
+                            xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
                 } else {
-                    logger.info("自动添加 ScheduleType = {}, JobCron = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
+                    logger.info(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
                 }
             } else {
-                logger.info("存在 ScheduleType = {}, JobCron = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
-                        xxlJobInfo.getScheduleType(), xxlJobInfo.getJobCron(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
+                logger.info(">>>>>>>>>>> 存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
+                        xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
                 ReturnT<String> returnT4 =  getXxlJobTemplate().updateJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
-                    logger.error("自动更新 ScheduleType = {}, JobCron = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
-                            xxlJobInfo.getScheduleType(), xxlJobInfo.getJobCron(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
+                    logger.error(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
+                            xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
                 } else {
-                    logger.info("自动更新 ScheduleType = {}, JobCron = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
+                    logger.info(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
                 }
             }
         }

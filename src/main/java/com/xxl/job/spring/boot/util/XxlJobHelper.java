@@ -2,6 +2,7 @@ package com.xxl.job.spring.boot.util;
 
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
+import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
 import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.executor.ExecutorRouteStrategyEnum;
 import com.xxl.job.spring.boot.executor.ExecutorTriggerPeriodEnum;
@@ -27,7 +28,8 @@ public class XxlJobHelper {
      * @param callbackUri 回调url
      */
     public static XxlJobInfo buildJobInfo(Integer jobGroup,
-                                          String cronExpression,
+                                          ScheduleTypeEnum scheduleType,
+                                          String scheduleConf,
                                           String jobDesc,
                                           String author,
                                           String executorHandler,
@@ -38,13 +40,14 @@ public class XxlJobHelper {
         XxlJobInfo jobInfo = new XxlJobInfo();
         jobInfo.setJobGroup(jobGroup);
         jobInfo.setJobDesc(jobDesc);
-        jobInfo.setJobCron(cronExpression);
         jobInfo.setAuthor(author);
         jobInfo.setExecutorHandler(executorHandler);
         jobInfo.setGlueType(glueType.name());
         jobInfo.setExecutorRouteStrategy(executorRouteStrategy.name());
         jobInfo.setExecutorBlockStrategy(executorBlockStrategy.name());
         jobInfo.setExecutorParam(callbackUri);
+        jobInfo.setScheduleType(scheduleType.name());
+        jobInfo.setScheduleConf(scheduleConf);
         return jobInfo;
     }
 

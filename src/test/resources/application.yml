@@ -1,3 +1,5 @@
+server:
+  port: 31734
 #XXL-JOB
 xxl:
   job:
@@ -12,6 +14,7 @@ xxl:
         expire-after-write: 5s
         refresh-after-write: 5s
     executor:
+      title: 测试任务执行器
       address:
       ip:
       appname: evaluation-job-executor

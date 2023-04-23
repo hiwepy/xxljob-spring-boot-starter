@@ -38,11 +38,6 @@ public class XxlJobInfo implements Serializable {
 	private Integer jobGroup;
 
 	/**
-	 * 任务执行CRON表达式
-	 */
-	private String jobCron;
-
-	/**
 	 * 任务描述
 	 */
 	private String jobDesc;

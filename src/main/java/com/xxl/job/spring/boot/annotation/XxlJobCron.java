@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.spring.boot.executor.ExecutorRouteStrategyEnum;
+import com.xxl.job.spring.boot.executor.MisfireStrategyEnum;
 
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
@@ -54,22 +55,27 @@ public @interface XxlJobCron {
 	 */
 	String param() default "";
 
-	/*
+	/**
 	 * 失败重试次数
 	 */
 	int failRetryCount() default 3;
 
-	/*
-	 * 阻塞处理策略
-	 */
-	ExecutorBlockStrategyEnum blockStrategy() default ExecutorBlockStrategyEnum.COVER_EARLY;
-
-	/*
+	/**
 	 * 执行器路由策略
 	 */
 	ExecutorRouteStrategyEnum routeStrategy() default ExecutorRouteStrategyEnum.LEAST_FREQUENTLY_USED;
 
-	/*
+	/**
+	 * 阻塞处理策略
+	 */
+	ExecutorBlockStrategyEnum blockStrategy() default ExecutorBlockStrategyEnum.COVER_EARLY;
+
+	/**
+	 * 调度过期策略
+	 */
+	MisfireStrategyEnum misfireStrategy() default MisfireStrategyEnum.DO_NOTHING;
+
+	/**
 	 * 任务执行超时时间，单位秒
 	 */
 	int timeout() default 3000;
