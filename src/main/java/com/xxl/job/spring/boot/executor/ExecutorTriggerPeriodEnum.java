@@ -1,9 +1,5 @@
 package com.xxl.job.spring.boot.executor;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * 任务周期枚举类
  */

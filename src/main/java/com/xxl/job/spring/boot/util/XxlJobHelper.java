@@ -2,10 +2,10 @@ package com.xxl.job.spring.boot.util;
 
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
-import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.executor.ExecutorRouteStrategyEnum;
 import com.xxl.job.spring.boot.executor.ExecutorTriggerPeriodEnum;
+import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
+import com.xxl.job.spring.boot.model.XxlJobInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

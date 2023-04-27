@@ -15,29 +15,24 @@
  */
 package com.xxl.job.spring.boot;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.xxl.job.spring.boot.model.*;
+import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.spring.boot.model.XxlJobGroup;
+import com.xxl.job.spring.boot.model.XxlJobGroupList;
+import com.xxl.job.spring.boot.model.XxlJobInfo;
+import com.xxl.job.spring.boot.model.XxlJobInfoList;
 import lombok.extern.slf4j.Slf4j;
-
 import okhttp3.*;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
-import com.xxl.job.core.biz.model.ReturnT;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class XxlJobTemplate {

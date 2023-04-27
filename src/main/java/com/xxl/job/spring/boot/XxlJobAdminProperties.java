@@ -18,12 +18,6 @@ package com.xxl.job.spring.boot;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
-import java.time.Duration;
-
 @ConfigurationProperties(XxlJobAdminProperties.PREFIX)
 @Data
 public class XxlJobAdminProperties {

@@ -15,10 +15,14 @@
  */
 package com.xxl.job.spring.boot;
 
-import java.lang.reflect.Method;
-import java.util.*;
-
+import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
+import com.xxl.job.core.glue.GlueFactory;
+import com.xxl.job.core.glue.GlueTypeEnum;
+import com.xxl.job.core.handler.annotation.XxlJob;
+import com.xxl.job.spring.boot.annotation.XxlJobCron;
 import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
+import com.xxl.job.spring.boot.model.XxlJobGroup;
 import com.xxl.job.spring.boot.model.XxlJobGroupList;
 import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.model.XxlJobInfoList;
@@ -33,13 +37,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import com.xxl.job.core.glue.GlueFactory;
-import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import com.xxl.job.spring.boot.annotation.XxlJobCron;
-import com.xxl.job.spring.boot.model.XxlJobGroup;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * TODO
