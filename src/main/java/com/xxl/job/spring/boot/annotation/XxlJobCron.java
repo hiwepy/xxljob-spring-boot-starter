@@ -27,6 +27,11 @@ import java.lang.annotation.*;
 public @interface XxlJobCron {
 
 	/*
+	 * 任务UID编号
+	 */
+	String uid() default "";
+
+	/*
 	 * 任务执行CRON表达式
 	 */
 	String cron() default "";

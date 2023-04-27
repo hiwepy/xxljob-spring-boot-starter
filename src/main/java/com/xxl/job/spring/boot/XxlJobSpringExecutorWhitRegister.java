@@ -26,8 +26,7 @@ import com.xxl.job.spring.boot.model.XxlJobGroup;
 import com.xxl.job.spring.boot.model.XxlJobGroupList;
 import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.model.XxlJobInfoList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -44,9 +43,9 @@ import java.util.*;
  * TODO
  * @author 		： <a href="https://github.com/hiwepy">wandl</a>
  */
+@Slf4j
 public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 	
-	private static final Logger logger = LoggerFactory.getLogger(XxlJobSpringExecutorWhitRegister.class);
 	private final XxlJobTemplate xxlJobTemplate;
     private String appName;
     private String appTitle;
@@ -100,7 +99,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
             Object bean = null;
             Lazy onBean = applicationContext.findAnnotationOnBean(beanDefinitionName, Lazy.class);
             if (onBean!=null){
-                logger.debug("xxl-job annotation scan, skip @Lazy Bean:{}", beanDefinitionName);
+                log.debug("xxl-job annotation scan, skip @Lazy Bean:{}", beanDefinitionName);
                 continue;
             }else {
                 bean = applicationContext.getBean(beanDefinitionName);
@@ -117,7 +116,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
                             }
                         });
             } catch (Throwable ex) {
-                logger.error("xxl-job method-jobhandler resolve error for bean[" + beanDefinitionName + "].", ex);
+                log.error("xxl-job method-jobhandler resolve error for bean[" + beanDefinitionName + "].", ex);
             }
             if (annotatedMethods==null || annotatedMethods.isEmpty()) {
                 continue;
@@ -192,7 +191,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         // 检查任务组是否存在
         ReturnT<XxlJobGroupList> returnT1 = getXxlJobTemplate().jobInfoGroupList(0, Integer.MAX_VALUE, appName, null);
         if (returnT1.getCode() == ReturnT.FAIL_CODE) {
-            logger.error(">>>>>>>>>>> 执行器查询失败!失败原因:{}", returnT1.getMsg());
+            log.error(">>>>>>>>>>> 执行器查询失败!失败原因:{}", returnT1.getMsg());
             return;
         }
         // 执行器不存在则创建
@@ -200,7 +199,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         Integer jobGroupId = null;
         if(Objects.isNull(jobGroupList) || CollectionUtils.isEmpty(jobGroupList.getData())
                 || jobGroupList.getData().stream().noneMatch(xxlJobGroup -> xxlJobGroup.getAppName().equals(appName))) {
-            logger.info(">>>>>>>>>>> 执行器'{}'不存在，开始自动添加！", appName);
+            log.info(">>>>>>>>>>> 执行器'{}'不存在，开始自动添加！", appName);
             // 创建任务组对象
             XxlJobGroup xxlJobGroup = new XxlJobGroup();
             xxlJobGroup.setAppName(appName);
@@ -209,12 +208,12 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
             xxlJobGroup.setTitle(appTitle);
             ReturnT<String> returnT2 = getXxlJobTemplate().addJobGroup(xxlJobGroup);
             if (returnT2.getCode() == ReturnT.FAIL_CODE) {
-                logger.error( ">>>>>>>>>>> 执行器'{}'添加添加失败!失败原因:{}", appName, returnT2.getMsg());
+                log.error( ">>>>>>>>>>> 执行器'{}'添加添加失败!失败原因:{}", appName, returnT2.getMsg());
                 return;
             }
             returnT1 = getXxlJobTemplate().jobInfoGroupList(0, Integer.MAX_VALUE, appName, null);
             if (returnT1.getCode() == ReturnT.FAIL_CODE) {
-                logger.error(">>>>>>>>>>> 执行器查询失败!失败原因:{}", returnT1.getMsg());
+                log.error(">>>>>>>>>>> 执行器查询失败!失败原因:{}", returnT1.getMsg());
                 return;
             }
             jobGroupList = returnT1.getContent();
@@ -224,7 +223,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         // 定时任务是否存在
         ReturnT<XxlJobInfoList> returnT3 = getXxlJobTemplate().jobInfoList(0, Integer.MAX_VALUE, jobGroupId);
         if (returnT3.getCode() == ReturnT.FAIL_CODE) {
-            logger.error(">>>>>>>>>>> 定时任务查询失败!失败原因:{}", returnT3.getMsg());
+            log.error(">>>>>>>>>>> 定时任务查询失败!失败原因:{}", returnT3.getMsg());
             return;
         }
         XxlJobInfoList jobInfoList = returnT3.getContent();
@@ -232,7 +231,7 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         // 执行器存在或者创建成功，添加定时任务
         for (XxlJobInfo xxlJobInfo : cacheJobs) {
 
-            logger.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getScheduleConf());
+            log.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getScheduleConf());
 
             xxlJobInfo.setJobGroup(jobGroupId);
             if(Objects.isNull(jobInfoList) || CollectionUtils.isEmpty(jobInfoList.getData())
@@ -243,25 +242,25 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
                                 && jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())
                                 ;
             })) {
-                logger.info(">>>>>>>>>>> 不存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
+                log.info(">>>>>>>>>>> 不存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
                         xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
                 // 自动添加定时任务
                 ReturnT<Integer> returnT4 =  getXxlJobTemplate().addJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
-                    logger.error(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
+                    log.error(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
                             xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
                 } else {
-                    logger.info(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
+                    log.info(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
                 }
             } else {
-                logger.info(">>>>>>>>>>> 存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
+                log.info(">>>>>>>>>>> 存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
                         xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
                 ReturnT<String> returnT4 =  getXxlJobTemplate().updateJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
-                    logger.error(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
+                    log.error(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
                             xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
                 } else {
-                    logger.info(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
+                    log.info(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
                 }
             }
         }
