@@ -77,9 +77,6 @@ public class XxlJobTemplate {
 			// xxl-job admin 请求结果成功
 			if(response.isSuccessful()) {
 				log.info("xxl-job login success.");
-				String body = response.body().string();
-				ReturnT<String> returnT = JSON.parseObject(body, new TypeReference<ReturnT<String>>() {});
-				returnT.setCode(ReturnT.SUCCESS_CODE);
 				// 从返回结果中获取cookie
 				String cookie = response.header(HttpHeaders.SET_COOKIE);
 				log.info("xxl-job cookie {}.", cookie);
@@ -95,6 +92,12 @@ public class XxlJobTemplate {
 		}
 	}
 
+	private boolean isResponseJson(Response response) {
+		String contentType = response.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+		return contentType != null && (contentType.startsWith(MediaType.APPLICATION_JSON_VALUE)
+				|| contentType.startsWith(MediaType.APPLICATION_JSON_UTF8_VALUE));
+	}
+
 	/**
 	 * 退出登录
 	 * @return
@@ -106,7 +109,17 @@ public class XxlJobTemplate {
 		String url = this.joinPath(XxlJobConstants.LOGOUT_GET);
 		Request request = this.buildRequestEntity(url, paramMap);
 		// xxl-job admin 请求操作
-		return this.doRequest(request);
+		Response response = okhttp3Client.newCall(request).execute();
+		// xxl-job admin 请求结果成功
+		if(response.isSuccessful()) {
+			log.info("xxl-job logout success.");
+			// 返回cookie
+			return ReturnT.SUCCESS;
+		}
+		// xxl-job admin 请求结果失败
+		log.error("xxl-job logout fail.");
+		// xxl-job admin 请求结果失败
+		return new ReturnT<String>(ReturnT.FAIL_CODE, response.toString());
 	}
 
 	/**

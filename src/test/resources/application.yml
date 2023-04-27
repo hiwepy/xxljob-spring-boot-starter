@@ -17,7 +17,7 @@ xxl:
       title: 测试任务执行器
       address:
       ip:
-      appname: evaluation-job-executor
+      appname: ${spring.application.name}
       port: 31734
       logpath: /data/logs/xxl-job/jobhandler
       logretentiondays: 30
