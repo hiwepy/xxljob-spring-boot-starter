@@ -233,7 +233,6 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 
             log.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getScheduleConf());
 
-            xxlJobInfo.setJobGroup(jobGroupId);
             if(Objects.isNull(jobInfoList) || CollectionUtils.isEmpty(jobInfoList.getData())
                     || jobInfoList.getData().stream().noneMatch(jobInfo -> jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())
             )) {
@@ -248,8 +247,12 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
                     log.info(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
                 }
             } else {
-                log.info(">>>>>>>>>>> 存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
-                        xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
+                Optional<XxlJobInfo> optional = jobInfoList.getData().stream().filter(jobInfo -> jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())).findFirst();
+                xxlJobInfo.setId(optional.get().getId());
+
+                log.info(">>>>>>>>>>> 存在 JobId = {}, ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
+                        xxlJobInfo.getId(), xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
+
                 ReturnT<String> returnT4 =  getXxlJobTemplate().updateJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
                     log.error(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
