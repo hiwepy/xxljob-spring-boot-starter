@@ -231,6 +231,8 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         // 执行器存在或者创建成功，添加定时任务
         for (XxlJobInfo xxlJobInfo : cacheJobs) {
 
+            xxlJobInfo.setJobGroup(jobGroupId);
+
             log.info(">>>>>>>>>>> xxl-job cron task register jobhandler, name:{}, cron :{}", xxlJobInfo.getExecutorHandler(), xxlJobInfo.getScheduleConf());
 
             if(Objects.isNull(jobInfoList) || CollectionUtils.isEmpty(jobInfoList.getData())
