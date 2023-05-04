@@ -23,16 +23,4 @@ public class XxlJobMetricsProperties {
 	 */
 	private Map<String, String > extraTags = new LinkedHashMap<>(16);
 
-	/**
-	 * Whether include host tag.
-	 */
-	boolean includeHostTag;
-
-	/**
-	 * The tag keys to request.
-	 */
-	List<String> requestTagKeys;
-
-
-
 }
