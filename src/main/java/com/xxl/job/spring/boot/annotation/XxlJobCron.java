@@ -16,8 +16,10 @@
 package com.xxl.job.spring.boot.annotation;
 
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
+import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.spring.boot.executor.ExecutorRouteStrategyEnum;
 import com.xxl.job.spring.boot.executor.MisfireStrategyEnum;
+import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
 
 import java.lang.annotation.*;
 
@@ -46,6 +48,11 @@ public @interface XxlJobCron {
 	 */
 	String alarmEmail() default "";
 
+	/**
+	 * 调度类型 ScheduleTypeEnum
+	 */
+	ScheduleTypeEnum scheduleType() default ScheduleTypeEnum.CRON;
+
 	/*
 	 * 执行器描述
 	 */
@@ -60,6 +67,11 @@ public @interface XxlJobCron {
 	 * 失败重试次数
 	 */
 	int failRetryCount() default 3;
+
+	/**
+	 * GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
+	 */
+	GlueTypeEnum glueType() default GlueTypeEnum.BEAN;
 
 	/**
 	 * 执行器路由策略

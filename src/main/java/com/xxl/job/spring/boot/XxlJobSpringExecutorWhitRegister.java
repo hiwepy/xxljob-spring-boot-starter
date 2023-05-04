@@ -158,11 +158,11 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
         // 报警邮件
         xxlJobInfo.setAlarmEmail(xxlJobCron.alarmEmail());
         // 调度类型
-        xxlJobInfo.setScheduleType(ScheduleTypeEnum.CRON.name());
+        xxlJobInfo.setScheduleType(xxlJobCron.scheduleType().name());
         // Cron
         xxlJobInfo.setScheduleConf(xxlJobCron.cron());
         // 运行模式
-        xxlJobInfo.setGlueType(GlueTypeEnum.BEAN.name());
+        xxlJobInfo.setGlueType(xxlJobCron.glueType().name());
         // JobHandler
         xxlJobInfo.setExecutorHandler(name);
         // 任务参数
@@ -235,13 +235,8 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 
             xxlJobInfo.setJobGroup(jobGroupId);
             if(Objects.isNull(jobInfoList) || CollectionUtils.isEmpty(jobInfoList.getData())
-                    || jobInfoList.getData().stream().noneMatch(jobInfo -> {
-                        return jobInfo.getScheduleType().equals(xxlJobInfo.getScheduleType())
-                                && jobInfo.getScheduleConf().equals(xxlJobInfo.getScheduleConf())
-                                && jobInfo.getGlueType().compareTo(xxlJobInfo.getGlueType()) == 0
-                                && jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())
-                                ;
-            })) {
+                    || jobInfoList.getData().stream().noneMatch(jobInfo -> jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())
+            )) {
                 log.info(">>>>>>>>>>> 不存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
                         xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
                 // 自动添加定时任务
