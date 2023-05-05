@@ -54,18 +54,16 @@ public class MetricMethodJobHandler extends IJobHandler {
     @Override
     public void execute() throws Exception {
 
-        // 记录请求开始时间
-        long start = System.currentTimeMillis();
-        // 一次请求计数 +1
-        submitted.increment();
-        // 当前正在运行的请求数 +1
-        running.increment();
-
         // 1、创建并启动 StopWatch
         XxlJob job = AnnotationUtils.findAnnotation(method, XxlJob.class);
         StopWatch stopWatch = new StopWatch(job.value());
         XxlJobCron jobCron = AnnotationUtils.findAnnotation(method, XxlJobCron.class);
         stopWatch.start(Objects.nonNull(jobCron) ? jobCron.desc() : job.value());
+
+        // 一次请求计数 +1
+        submitted.increment();
+        // 当前正在运行的请求数 +1
+        running.increment();
 
         // 3、获取 XxlJobCron 注解
         String metric = MetricNames.name(XxlJobMetrics.XXL_JOB_METRIC_NAME_PREFIX, job.value());
@@ -80,18 +78,18 @@ public class MetricMethodJobHandler extends IJobHandler {
             } else {
                 method.invoke(target);
             }
-            if(stopWatch.isRunning()){
-                stopWatch.stop();
-            }
         } catch (Throwable ex) {
             if(stopWatch.isRunning()){
                 stopWatch.stop();
             }
             throw ex;
         } finally {
+            if(stopWatch.isRunning()){
+                stopWatch.stop();
+            }
             // 记录本次请求耗时
-            timer.record(System.currentTimeMillis() - start, TimeUnit.MILLISECONDS);
-            duration.record(System.currentTimeMillis() - start, TimeUnit.MILLISECONDS);
+            timer.record(stopWatch.getTotalTimeMillis(), TimeUnit.MILLISECONDS);
+            duration.record(stopWatch.getTotalTimeMillis(), TimeUnit.MILLISECONDS);
             // 当前正在运行的请求数 -1
             running.increment(-1);
             // 当前已完成的请求数 +1

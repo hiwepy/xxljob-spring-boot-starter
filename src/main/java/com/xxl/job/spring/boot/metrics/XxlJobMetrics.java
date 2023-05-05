@@ -15,13 +15,20 @@
  */
 package com.xxl.job.spring.boot.metrics;
 
+import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
+import com.xxl.job.core.thread.TriggerCallbackThread;
 import io.micrometer.core.instrument.*;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToLongFunction;
@@ -29,46 +36,13 @@ import java.util.function.ToLongFunction;
 /**
  * XXL Job Metrics
  */
+@Slf4j
 public class XxlJobMetrics implements MeterBinder, ApplicationListener<ApplicationStartedEvent> {
 
 	/**
 	 * Prefix used for all XXL Job metric names.
 	 */
-	public static final String XXL_JOB_METRIC_NAME_PREFIX = "xxl-job";
-
-	/**
-	 * dispatcher
-	 */
-	public static final String METRIC_NAME_DISPATCHER_MAX_REQUESTS 			= XXL_JOB_METRIC_NAME_PREFIX + ".job.max.requests";
-	public static final String METRIC_NAME_DISPATCHER_MAX_REQUESTS_PERHOST 	= XXL_JOB_METRIC_NAME_PREFIX + ".dispatcher.max.requests.perhost";
-	public static final String METRIC_NAME_DISPATCHER_QUEUED_CALLS_COUNT		= XXL_JOB_METRIC_NAME_PREFIX + ".dispatcher.queued.calls.count";
-	public static final String METRIC_NAME_DISPATCHER_RUNNING_CALLS_COUNT		= XXL_JOB_METRIC_NAME_PREFIX + ".job.running.calls.count";
-
-	/**
-	 * http cache
-	 */
-	public static final String METRIC_NAME_CACHE_REQUEST_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".job.request.count";
-	public static final String METRIC_NAME_CACHE_HIT_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".cache.hit.count";
-	public static final String METRIC_NAME_CACHE_NETWORK_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".cache.network.count";
-	public static final String METRIC_NAME_CACHE_WRITE_SUCCESS_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".job.write.success.count";
-	public static final String METRIC_NAME_CACHE_WRITE_ABORT_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".job.abort.count";
-	public static final String METRIC_NAME_CACHE_CURRENT_SIZE 	= XXL_JOB_METRIC_NAME_PREFIX + ".cache.current.size";
-	public static final String METRIC_NAME_CACHE_MAX_SIZE 	= XXL_JOB_METRIC_NAME_PREFIX + ".cache.max.size";
-
-	/**
-	 * connection pool
-	 */
-	public static final String METRIC_NAME_CONNECTION_POOL_CONNECTION_COUNT		= XXL_JOB_METRIC_NAME_PREFIX + ".connection.pool.connection.count";
-	public static final String METRIC_NAME_CONNECTION_POOL_IDLE_CONNECTION_COUNT		= XXL_JOB_METRIC_NAME_PREFIX + ".connection.pool.idle.connection.count";
-
-	/**
-	 * timeout
-	 */
-	public static final String METRIC_NAME_CALL_TIMEOUT_COUNT 			= XXL_JOB_METRIC_NAME_PREFIX + ".call.timeout.count";
-	public static final String METRIC_NAME_CONNECT_TIMEOUT_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".connect.timeout.count";
-	public static final String METRIC_NAME_READ_TIMEOUT_COUNT 			= XXL_JOB_METRIC_NAME_PREFIX + ".read.timeout.count";
-	public static final String METRIC_NAME_WRITE_TIMEOUT_COUNT 		= XXL_JOB_METRIC_NAME_PREFIX + ".write.timeout.count";
-	public static final String METRIC_NAME_PING_FAIL_COUNT 			= XXL_JOB_METRIC_NAME_PREFIX + ".ping.fail.count";
+	public static final String XXL_JOB_METRIC_NAME_PREFIX = "xxl";
 
 	/**
 	 * job
@@ -77,6 +51,7 @@ public class XxlJobMetrics implements MeterBinder, ApplicationListener<Applicati
 	public static final String METRIC_NAME_JOB_REQUESTS_RUNNING 			= XXL_JOB_METRIC_NAME_PREFIX + ".job.running";
 	public static final String METRIC_NAME_JOB_REQUESTS_COMPLETED 			= XXL_JOB_METRIC_NAME_PREFIX + ".job.completed";
 	public static final String METRIC_NAME_JOB_REQUESTS_DURATION 			= XXL_JOB_METRIC_NAME_PREFIX + ".job.duration";
+	public static final String METRIC_NAME_JOB_QUEUE_SIZE 			= XXL_JOB_METRIC_NAME_PREFIX + ".job.queue.size";
 
 	private XxlJobSpringExecutor executor;
 	private Iterable<Tag> tags;
@@ -98,6 +73,20 @@ public class XxlJobMetrics implements MeterBinder, ApplicationListener<Applicati
 	@Override
 	public void bindTo(MeterRegistry registry) {
 
+		bindCounter(registry, METRIC_NAME_JOB_QUEUE_SIZE, "the size of job callBack Queue ", TriggerCallbackThread.getInstance(), (m) -> {
+			try {
+				Field field = ReflectionUtils.findField(TriggerCallbackThread.class, "callBackQueue");
+				ReflectionUtils.makeAccessible(field);
+				Object queue = field.get(m);
+				if (Objects.nonNull(queue) && queue instanceof LinkedBlockingQueue) {
+					return ((LinkedBlockingQueue) queue).size();
+				}
+				return 0;
+			} catch (Exception e) {
+				log.error(e.getMessage());
+			}
+			return 0;
+		});
 		// bindCounter(registry, METRIC_NAME_DISPATCHER_MAX_REQUESTS, "max requests of dispatcher ", dispatcher, Dispatcher::getMaxRequests);
 	}
 

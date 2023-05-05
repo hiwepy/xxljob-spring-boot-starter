@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ public class XxlJobMetricsAutoConfiguration {
 	@Bean
 	public XxlJobSpringExecutor xxlJobExecutor(
 			ObjectProvider<MeterRegistry> registryProvider,
-			XxlJobTemplate xxlJobTemplate,
+			ObjectProvider<XxlJobTemplate> xxlJobTemplateProvider,
 			XxlJobProperties properties,
 			XxlJobAdminProperties adminProperties,
 			XxlJobExecutorProperties executorProperties,
@@ -44,12 +45,12 @@ public class XxlJobMetricsAutoConfiguration {
 
 		log.info(">>>>>>>>>>> xxl-job auto binding and metrics executor init.");
 
-		Collection<Tag> extraTags = CollectionUtils.isEmpty(metricsProperties.getExtraTags()) ? Collections.emptyList() : metricsProperties.getExtraTags()
+		Collection<Tag> extraTags = CollectionUtils.isEmpty(metricsProperties.getExtraTags()) ? new ArrayList<>() : metricsProperties.getExtraTags()
 				.entrySet().stream().map(e -> Tag.of(e.getKey(), e.getValue()))
 				.collect(Collectors.toList());
 		extraTags.add(Tag.of("executor", executorProperties.getAppname()));
 
-		XxlJobAutoBindingAndMetricsSpringExecutor xxlJobExecutor = new XxlJobAutoBindingAndMetricsSpringExecutor(registryProvider.getObject(), xxlJobTemplate, extraTags);
+		XxlJobAutoBindingAndMetricsSpringExecutor xxlJobExecutor = new XxlJobAutoBindingAndMetricsSpringExecutor(registryProvider.getObject(), xxlJobTemplateProvider.getObject(), extraTags);
 		xxlJobExecutor.setAdminAddresses(adminProperties.getAddresses());
 		xxlJobExecutor.setAppname(executorProperties.getAppname());
 		xxlJobExecutor.setAppTitle(executorProperties.getTitle());

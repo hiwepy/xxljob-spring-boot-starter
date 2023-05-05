@@ -2,8 +2,8 @@
 
 > XXL-JOB是一个分布式任务调度平台，其核心设计目标是开发迅速、学习简单、轻量级、易扩展。
 
-官方文档：https://www.xuxueli.com/xxl-job/
-GitHub：https://github.com/xuxueli/xxl-job/
+- 官方文档：https://www.xuxueli.com/xxl-job/
+- GitHub：https://github.com/xuxueli/xxl-job/
 
 Features
 
@@ -62,27 +62,58 @@ Features
 </dependency>
 ```
 
-##### 2、在`application.properties`文件中增加如下配置
+##### 2、增加如下配置
+
+在`application.properties`文件中增加如下配置
 
 ```properties
 ##########################XXL-JOB执行器参数定义##################################
-### 是否启用 XXL-Job 执行器
-xxl.job.enabled=true
-### 调度中心部署跟地址 [选填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；
+### 调度中心部署跟地址 [必填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；
 xxl.job.admin.addresses=http://localhost:8091/xxl-job-admin
+### 调度中心登录用户名 [必填]
+xxl.job.admin.username=admin
+### 调度中心登录密码 [必填]
+xxl.job.admin.password=123456
+xxl.job.admin.cookie.maximum-size=1000
+xxl.job.admin.cookie.expire-after-write=5s
+xxl.job.admin.cookie.refresh-after-write=5s
 ### 执行器AppName [选填]：执行器心跳注册分组依据；为空则关闭自动注册
 xxl.job.executor.appname=${spring.application.name}
-xxl.job.executor.title=${spring.application.name}
+xxl.job.executor.title=任务执行器
 ### 执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"；
 xxl.job.executor.ip=
 ### 执行器端口号 [选填]：小于等于0则自动获取；默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；
 xxl.job.executor.port=-1
 ### 执行器通讯TOKEN [选填]：非空时启用；
-xxl.job.accessToken=0Izqw61KQ6
+xxl.job.accessToken=default_token
 ### 执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；
 xxl.job.executor.logpath=/data/applogs/xxl-job/jobhandler
 ### 执行器日志保存天数 [选填] ：值大于3时生效，启用执行器Log文件定期清理功能，否则不生效；
 xxl.job.executor.logretentiondays=30
+```
+
+或者在`application.yaml`文件中增加如下配置
+
+```yaml
+xxl:
+  job:
+    accessToken: default_token
+    admin:
+      addresses: http://localhost:8091/xxl-job-admin
+      username: admin
+      password: 123456
+      cookie:
+        maximum-size: 1000
+        expire-after-write: 5s
+        refresh-after-write: 5s
+    executor:
+      address:
+      ip:
+      appname: evaluation-job-executor
+      title: 任务执行器
+      port: 31734
+      logpath: /data/logs/xxl-job/jobhandler
+      logretentiondays: 30
 ```
 
 ##### 3、使用示例
@@ -354,7 +385,68 @@ public class SampleXxlJob {
 
 }
 ```
- 
+
+
+##### 4、指标采集
+
+项目中引入 micrometer-prometheus 依赖
+
+```xml
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+```
+
+在`application.properties`文件中增加如下配置
+
+```properties
+### 执行器日志保存天数 [选填] ：值大于3时生效，启用执行器Log文件定期清理功能，否则不生效；
+xxl.job.metrics.enabled=true
+```
+
+或者在`application.yaml`文件中增加如下配置
+
+```yaml
+xxl:
+  job:
+    metrics:
+      enabled: true
+```
+
+`xxl-job` 组件的指标采集如下：
+
+```markdown
+# HELP xxl_job_duration_seconds_max
+# TYPE xxl_job_duration_seconds_max gauge
+xxl_job_duration_seconds_max{application="app-test",executor="app-job-executor",} 0.18
+# HELP xxl_job_duration_seconds
+# TYPE xxl_job_duration_seconds summary
+xxl_job_duration_seconds_count{application="app-test",executor="app-job-executor",} 2.0
+xxl_job_duration_seconds_sum{application="app-test",executor="app-job-executor",} 0.192
+# HELP xxl_job_running_total
+# TYPE xxl_job_running_total counter
+xxl_job_running_total{application="app-test",executor="app-job-executor",} 2.0
+# HELP xxl_job_queue_size_total the size of job callBack Queue
+# TYPE xxl_job_queue_size_total counter
+xxl_job_queue_size_total{application="app-test",} 0.0
+# HELP xxl_job_submitted_total
+# TYPE xxl_job_submitted_total counter
+xxl_job_submitted_total{application="app-test",executor="app-job-executor",} 2.0
+# HELP xxl_job_completed_total
+# TYPE xxl_job_completed_total counter
+xxl_job_completed_total{application="app-test",executor="app-job-executor",} 2.0
+# HELP xxl_cleanExpireTaskHandler_seconds
+# TYPE xxl_cleanExpireTaskHandler_seconds summary
+xxl_cleanExpireTaskHandler_seconds_count{application="app-test",executor="app-job-executor",job="cleanExpireTaskHandler",} 2.0
+xxl_cleanExpireTaskHandler_seconds_sum{application="app-test",executor="app-job-executor",job="cleanExpireTaskHandler",} 0.192
+# HELP xxl_cleanExpireTaskHandler_seconds_max
+# TYPE xxl_cleanExpireTaskHandler_seconds_max gauge
+xxl_cleanExpireTaskHandler_seconds_max{application="app-test",executor="app-job-executor",job="cleanExpireTaskHandler",} 0.18
+
+```
+
+
 
 ## Jeebiz 技术社区
 

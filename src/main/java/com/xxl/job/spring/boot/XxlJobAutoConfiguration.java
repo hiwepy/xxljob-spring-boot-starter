@@ -17,10 +17,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnClass(XxlJobExecutor.class)
 @EnableConfigurationProperties({
+	XxlJobProperties.class,
 	XxlJobAdminProperties.class,
 	XxlJobAdminCookieProperties.class,
-	XxlJobProperties.class,
-	XxlJobExecutorProperties.class
+	XxlJobExecutorProperties.class,
+	XxlJobMetricsProperties.class
 })
 @Slf4j
 public class XxlJobAutoConfiguration {
