@@ -18,7 +18,8 @@ public class XxlJobHelper {
     /**
      * 构建定时调度平台jobInfo
      * @param jobGroup 调度组
-     * @param cronExpression Cron表达式
+     * @param scheduleType 调度类型
+     * @param scheduleConf 调度配置
      * @param jobDesc 任务描述
      * @param author 任务负责人
      * @param executorHandler 行器，任务Handler名称

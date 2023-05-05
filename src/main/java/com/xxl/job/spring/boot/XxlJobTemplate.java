@@ -226,13 +226,13 @@ public class XxlJobTemplate {
 
 	/**
 	 * 获取xxl-job 执行器列表数据
-	 * @param start
-	 * @param length
-	 * @param jobGroup
-	 * @param triggerStatus
-	 * @param jobDesc
-	 * @param executorHandler
-	 * @param author
+	 * @param start 起始位置
+	 * @param length 数量
+	 * @param jobGroup 执行器主键ID
+	 * @param triggerStatus 调度状态：0-停止，1-运行
+	 * @param jobDesc 任务描述
+	 * @param executorHandler 执行器任务handler
+	 * @param author 任务创建者
 	 * @return
 	 */
     public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup,
