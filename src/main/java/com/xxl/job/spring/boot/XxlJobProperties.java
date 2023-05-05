@@ -29,11 +29,6 @@ public class XxlJobProperties {
 	public static final String PREFIX = "xxl.job";
 
 	/**
-	 * Enable XXL-Job.
-	 */
-	private boolean enabled = false;
-	
-	/**
 	 * 	执行器通讯TOKEN [选填]：非空时启用；
 	 */
 	private String accessToken;

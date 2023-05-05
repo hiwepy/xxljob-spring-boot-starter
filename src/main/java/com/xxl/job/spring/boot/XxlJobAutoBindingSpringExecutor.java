@@ -18,14 +18,14 @@ package com.xxl.job.spring.boot;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import com.xxl.job.core.glue.GlueFactory;
-import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.spring.boot.annotation.XxlJobCron;
-import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
 import com.xxl.job.spring.boot.model.XxlJobGroup;
 import com.xxl.job.spring.boot.model.XxlJobGroupList;
 import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.model.XxlJobInfoList;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -40,20 +40,20 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * TODO
+ * Xxl Job Handler 自动注册
  * @author 		： <a href="https://github.com/hiwepy">wandl</a>
  */
 @Slf4j
-public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
+public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
 	
-	private final XxlJobTemplate xxlJobTemplate;
+	private XxlJobTemplate xxlJobTemplate;
     private String appName;
     private String appTitle;
 	private List<XxlJobInfo> cacheJobs = new ArrayList<>();
 	private Random RANDOM_ORDER = new Random(10);
 	
-	public XxlJobSpringExecutorWhitRegister(XxlJobTemplate xxlJobTemplate) {
-		this.xxlJobTemplate = xxlJobTemplate;
+	public XxlJobAutoBindingSpringExecutor(XxlJobTemplate xxlJobTemplate) {
+        this.xxlJobTemplate = xxlJobTemplate;
 	}
 
 	@Override
@@ -135,8 +135,8 @@ public class XxlJobSpringExecutorWhitRegister extends XxlJobSpringExecutor {
 
         }
     }
-    
-	private void registJobHandlerCronTask(XxlJob xxlJob, Object bean, Method executeMethod) {
+
+    private void registJobHandlerCronTask(XxlJob xxlJob, Object bean, Method executeMethod) {
 
         String name = xxlJob.value();
         if (!StringUtils.hasText(name)) {

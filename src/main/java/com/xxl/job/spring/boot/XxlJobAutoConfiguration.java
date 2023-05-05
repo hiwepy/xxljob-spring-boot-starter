@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass(XxlJobExecutor.class)
-@ConditionalOnProperty(prefix = XxlJobProperties.PREFIX, value = "enabled", havingValue = "true")
 @EnableConfigurationProperties({
 	XxlJobAdminProperties.class,
 	XxlJobAdminCookieProperties.class,
@@ -45,8 +44,8 @@ public class XxlJobAutoConfiguration {
 			XxlJobProperties properties, 
 			XxlJobAdminProperties adminProperties,
 			XxlJobExecutorProperties executorProperties) {
-		log.info(">>>>>>>>>>> xxl-job executor init.");
-		XxlJobSpringExecutorWhitRegister xxlJobExecutor = new XxlJobSpringExecutorWhitRegister(xxlJobTemplate);
+		log.info(">>>>>>>>>>> xxl-job auto binding executor init.");
+		XxlJobAutoBindingSpringExecutor xxlJobExecutor = new XxlJobAutoBindingSpringExecutor(xxlJobTemplate);
 		xxlJobExecutor.setAdminAddresses(adminProperties.getAddresses());
 		xxlJobExecutor.setAppname(executorProperties.getAppname());
 		xxlJobExecutor.setAppTitle(executorProperties.getTitle());
