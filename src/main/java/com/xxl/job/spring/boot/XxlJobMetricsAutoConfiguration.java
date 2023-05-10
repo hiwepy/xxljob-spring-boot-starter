@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class XxlJobMetricsAutoConfiguration {
 
 	@Bean
+	@ConditionalOnProperty(prefix = XxlJobExecutorProperties.PREFIX, value = "enabled", havingValue = "true", matchIfMissing = true)
 	public XxlJobSpringExecutor xxlJobExecutor(
 			ObjectProvider<MeterRegistry> registryProvider,
 			ObjectProvider<XxlJobTemplate> xxlJobTemplateProvider,
@@ -63,6 +64,7 @@ public class XxlJobMetricsAutoConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnProperty(prefix = XxlJobExecutorProperties.PREFIX, value = "enabled", havingValue = "true", matchIfMissing = true)
 	public XxlJobMetrics xxlJobMetrics(XxlJobSpringExecutor executor) {
 		return new XxlJobMetrics(executor);
 	}

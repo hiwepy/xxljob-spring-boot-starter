@@ -40,6 +40,7 @@ public class XxlJobAutoConfiguration {
 	
 	@Bean
 	@ConditionalOnMissingBean
+	@ConditionalOnProperty(prefix = XxlJobExecutorProperties.PREFIX, value = "enabled", havingValue = "true", matchIfMissing = true)
 	public XxlJobSpringExecutor xxlJobExecutor(
 			XxlJobTemplate xxlJobTemplate,
 			XxlJobProperties properties, 

@@ -29,6 +29,11 @@ public class XxlJobExecutorProperties {
 	public static final String PREFIX = "xxl.job.executor";
 
 	/**
+	 * Enable XXL-Job Executor.
+	 */
+	private boolean enabled = true;
+
+	/**
 	 * 	执行器AppName [必填]：执行器心跳注册分组依据；为空则关闭自动注册.
 	 */
 	private String appname = "";
