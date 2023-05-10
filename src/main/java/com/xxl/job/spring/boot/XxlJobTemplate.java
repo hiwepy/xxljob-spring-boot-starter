@@ -258,7 +258,7 @@ public class XxlJobTemplate {
 	 * @return 任务id
 	 * @return
 	 */
-	public ReturnT<Integer> addJob(XxlJobInfo jobInfo) {
+	public ReturnT<String> addJob(XxlJobInfo jobInfo) {
 		// xxl-job admin 请求参数
 		Map<String, Object> paramMap = JSON.parseObject(JSON.toJSONString(jobInfo), Map.class);
 		// xxl-job admin 请求体

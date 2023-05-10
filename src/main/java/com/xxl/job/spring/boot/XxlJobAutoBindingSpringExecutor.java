@@ -241,7 +241,7 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
                 log.info(">>>>>>>>>>> 不存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
                         xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
                 // 自动添加定时任务
-                ReturnT<Integer> returnT4 =  getXxlJobTemplate().addJob(xxlJobInfo);
+                ReturnT<String> returnT4 =  getXxlJobTemplate().addJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
                     log.error(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
                             xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
