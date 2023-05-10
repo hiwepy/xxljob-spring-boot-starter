@@ -88,9 +88,8 @@ public class XxlJobTemplate {
 	}
 
 	private boolean isResponseJson(Response response) {
-		String contentType = response.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-		return contentType != null && (contentType.startsWith(MediaType.APPLICATION_JSON_VALUE)
-				|| contentType.startsWith(MediaType.APPLICATION_JSON_UTF8_VALUE));
+		String contentType = response.header(HttpHeaders.CONTENT_TYPE);
+		return contentType != null && (contentType.startsWith(MediaType.APPLICATION_JSON_VALUE));
 	}
 
 	/**
@@ -295,7 +294,7 @@ public class XxlJobTemplate {
 		paramMap.put("id", jobId);
 		// xxl-job admin 请求体
 		String url = this.joinPath(XxlJobConstants.JOBINFO_REMOVE);
-		Request request = this.buildRequestEntity(url,paramMap, true);
+		Request request = this.buildRequestEntity(url,paramMap, false);
 		// xxl-job admin 请求操作
 		return this.doRequest(request);
     }
@@ -419,8 +418,10 @@ public class XxlJobTemplate {
 				log.info("xxl-job request successful.");
 				String body = response.body().string();
 				log.debug("xxl-job response body: {} .", body);
-				T rt = JSON.parseObject(body, objectClass);
-				return new ReturnT<T>(rt);
+				if(isResponseJson(response)){
+					T rt = JSON.parseObject(body, objectClass);
+					return new ReturnT<T>(rt);
+				}
 			}
 			log.error("xxl-job request fail.");
 			// xxl-job admin 请求结果失败
@@ -445,9 +446,13 @@ public class XxlJobTemplate {
 	private <T> ReturnT<T> parseResponseEntity(Response response) throws IOException {
 		// xxl-job admin 请求结果成功
 		if(response.isSuccessful()) {
-			log.error("xxl-job request successful.");
-			ReturnT<T> returnT = JSON.parseObject(response.body().string(), new TypeReference<ReturnT<T>>() {});
-			return returnT;
+			log.info("xxl-job request successful.");
+			String body = response.body().string();
+			log.debug("xxl-job response body: {} .", body);
+			if(isResponseJson(response)){
+				ReturnT<T> returnT = JSON.parseObject(body, new TypeReference<ReturnT<T>>() {});
+				return returnT;
+			}
 		}
 		log.error("xxl-job request fail.");
 		// xxl-job admin 请求结果失败
