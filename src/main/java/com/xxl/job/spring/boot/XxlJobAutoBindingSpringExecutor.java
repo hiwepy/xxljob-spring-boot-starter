@@ -161,7 +161,7 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
         xxlJobInfo.setScheduleType(xxlJobCron.scheduleType().name());
         // Cron
         xxlJobInfo.setScheduleConf(xxlJobCron.cron());
-        xxlJobInfo.setCronExpression(xxlJobCron.cron());
+        xxlJobInfo.setJobCron(xxlJobCron.cron());
         // 运行模式
         xxlJobInfo.setGlueType(xxlJobCron.glueType().name());
         // JobHandler
@@ -178,6 +178,8 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
         xxlJobInfo.setExecutorBlockStrategy(xxlJobCron.blockStrategy().name());
         // 任务超时时间
         xxlJobInfo.setExecutorTimeout(xxlJobCron.timeout());
+        // 是否自启动
+        xxlJobInfo.setSelfStarting(xxlJobCron.selfStarting());
         cacheJobs.add(xxlJobInfo);
         
     }
@@ -239,31 +241,40 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
             if(Objects.isNull(jobInfoList) || CollectionUtils.isEmpty(jobInfoList.getData())
                     || jobInfoList.getData().stream().noneMatch(jobInfo -> jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())
             )) {
-                log.info(">>>>>>>>>>> 不存在 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动添加！",
-                        xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
+                log.info(">>>>>>>>>>> 不存在 ExecutorHandler = {} 的定时任务，开始自动添加！", xxlJobInfo.getExecutorHandler());
                 // 自动添加定时任务
                 ReturnT<String> returnT4 =  getXxlJobTemplate().addJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
-                    log.error(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
-                            xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
+                    log.error(">>>>>>>>>>> 自动添加 ExecutorHandler = {} 的定时任务失败!失败原因:{}", xxlJobInfo.getExecutorHandler(), returnT4.getMsg());
                 } else {
-                    log.info(">>>>>>>>>>> 自动添加 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
+                    log.info(">>>>>>>>>>> 自动添加 ExecutorHandler = {} 的定时任务成功!", xxlJobInfo.getExecutorHandler());
+                    xxlJobInfo.setId(Integer.valueOf(returnT4.getContent()));
                 }
             } else {
                 Optional<XxlJobInfo> optional = jobInfoList.getData().stream().filter(jobInfo -> jobInfo.getExecutorHandler().equals(xxlJobInfo.getExecutorHandler())).findFirst();
                 xxlJobInfo.setId(optional.get().getId());
 
-                log.info(">>>>>>>>>>> 存在 JobId = {}, ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务，开始自动更新！",
-                        xxlJobInfo.getId(), xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler());
+                log.info(">>>>>>>>>>> 存在 JobId = {}, ExecutorHandler = {} 的定时任务，开始自动更新！", xxlJobInfo.getId(), xxlJobInfo.getExecutorHandler());
 
                 ReturnT<String> returnT4 =  getXxlJobTemplate().updateJob(xxlJobInfo);
                 if (returnT4.getCode() == ReturnT.FAIL_CODE) {
-                    log.error(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}",
-                            xxlJobInfo.getScheduleType(), xxlJobInfo.getScheduleConf(), xxlJobInfo.getGlueType(), xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
+                    log.error(">>>>>>>>>>> 自动更新 JobId = {}, ExecutorHandler = {} 的定时任务失败!失败原因:{}", xxlJobInfo.getId(), xxlJobInfo.getExecutorHandler(), returnT4.getMsg());
                 } else {
-                    log.info(">>>>>>>>>>> 自动更新 ScheduleType = {}, ScheduleConf = {}, GlueType = {}, ExecutorHandler = {} 的定时任务成功!");
+                    log.info(">>>>>>>>>>> 自动更新 JobId = {}, ExecutorHandler = {} 的定时任务成功!", xxlJobInfo.getId(), xxlJobInfo.getExecutorHandler());
                 }
             }
+
+            // 如果是自启动，则启动任务
+            if(xxlJobInfo.isSelfStarting() && Objects.nonNull(xxlJobInfo.getId())){
+                ReturnT<String> returnT4 =  getXxlJobTemplate().startJob(xxlJobInfo.getId());
+                if (returnT4.getCode() == ReturnT.FAIL_CODE) {
+                    log.error(">>>>>>>>>>> 自动启动  ExecutorHandler = {} 的定时任务失败!失败原因:{}", xxlJobInfo.getExecutorHandler(), returnT3.getMsg());
+                } else {
+                    log.info(">>>>>>>>>>> 自动启动 ExecutorHandler = {} 的定时任务成功!", xxlJobInfo.getExecutorHandler());
+                }
+
+            }
+
         }
     }
 

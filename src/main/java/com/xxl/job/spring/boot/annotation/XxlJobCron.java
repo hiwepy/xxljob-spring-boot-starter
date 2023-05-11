@@ -28,22 +28,22 @@ import java.lang.annotation.*;
 @Inherited
 public @interface XxlJobCron {
 
-	/*
+	/**
 	 * 任务UID编号
 	 */
 	String uid() default "";
 
-	/*
+	/**
 	 * 任务执行CRON表达式
 	 */
 	String cron() default "";
 
-	/*
+	/**
 	 * 负责人
 	 */
 	String author() default "xxl-job";
 
-	/*
+	/**
 	 * 报警邮件
 	 */
 	String alarmEmail() default "";
@@ -53,12 +53,12 @@ public @interface XxlJobCron {
 	 */
 	ScheduleTypeEnum scheduleType() default ScheduleTypeEnum.CRON;
 
-	/*
+	/**
 	 * 执行器描述
 	 */
 	String desc() default "";
 
-	/*
+	/**
 	 * 执行器，任务参数
 	 */
 	String param() default "";
@@ -92,5 +92,10 @@ public @interface XxlJobCron {
 	 * 任务执行超时时间，单位秒
 	 */
 	int timeout() default 3000;
+
+	/**
+	 * 自启动
+	 */
+	boolean selfStarting() default false;
 
 }
