@@ -61,6 +61,7 @@ public class XxlJobInfo implements Serializable {
 	 * 调度配置，值含义取决于调度类型
 	 */
 	private String scheduleConf;
+	private String cronExpression;
 
 	/**
 	 * 调度过期策略

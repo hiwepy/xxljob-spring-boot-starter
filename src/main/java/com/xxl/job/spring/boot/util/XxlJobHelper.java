@@ -49,6 +49,7 @@ public class XxlJobHelper {
         jobInfo.setExecutorParam(callbackUri);
         jobInfo.setScheduleType(scheduleType.name());
         jobInfo.setScheduleConf(scheduleConf);
+        jobInfo.setCronExpression(scheduleConf);
         return jobInfo;
     }
 

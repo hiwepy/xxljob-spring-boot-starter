@@ -161,6 +161,7 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
         xxlJobInfo.setScheduleType(xxlJobCron.scheduleType().name());
         // Cron
         xxlJobInfo.setScheduleConf(xxlJobCron.cron());
+        xxlJobInfo.setCronExpression(xxlJobCron.cron());
         // 运行模式
         xxlJobInfo.setGlueType(xxlJobCron.glueType().name());
         // JobHandler
