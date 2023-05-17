@@ -107,13 +107,55 @@ xxl:
         expire-after-write: 5s
         refresh-after-write: 5s
     executor:
-      address:
       ip:
-      appname: evaluation-job-executor
+      appname: default-job-executor
       title: 任务执行器
       port: 31734
-      logpath: /data/logs/xxl-job/jobhandler
+      logpath: /logs/xxl-job/jobhandler
       logretentiondays: 30
+```
+
+如果是使用了`K8s部署服务`，且需要外部调用该执行节点的话，可参考如下配置：
+
+```yaml
+xxl:
+  job:
+    executor:
+      ip: [使用k8s主节点IP]
+      appname: default-job-executor
+      title: 任务执行器
+      port: 31734
+      logpath: /logs/xxl-job/jobhandler
+      logretentiondays: 30
+```
+
+> 指定xxl-job执行器端口，并配置宿主服务的Service对外暴露端口与xxl-job执行器端口相同！
+
+```yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-xxx-job-svc
+  labels:
+    app: my-xxx-job
+  annotations:
+    kubesphere.io/alias-name: xxx-定时任务服务
+    kubesphere.io/description: xxx-定时任务服务
+spec:
+  ports:
+    - name: tcp-6011
+      port: 6011
+      protocol: TCP
+      targetPort: 6011
+    - name: tcp-31734
+      protocol: TCP
+      port: 31734
+      targetPort: 31734
+      nodePort: 31734
+  selector:
+    app: my-xxx-job
+  type: NodePort
 ```
 
 ##### 3、使用示例
