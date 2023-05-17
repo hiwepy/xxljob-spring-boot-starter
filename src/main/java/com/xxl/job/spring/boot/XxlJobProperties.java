@@ -15,11 +15,10 @@
  */
 package com.xxl.job.spring.boot;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(XxlJobProperties.PREFIX)
 @Getter
@@ -29,11 +28,6 @@ public class XxlJobProperties {
 
 	public static final String PREFIX = "xxl.job";
 
-	/**
-	 * Enable XXL-Job.
-	 */
-	private boolean enabled = false;
-	
 	/**
 	 * 	执行器通讯TOKEN [选填]：非空时启用；
 	 */

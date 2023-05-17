@@ -15,16 +15,11 @@
  */
 package com.xxl.job.spring.boot;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 @ConfigurationProperties(XxlJobAdminProperties.PREFIX)
-@Getter
-@Setter
-@ToString
+@Data
 public class XxlJobAdminProperties {
 
 	public static final String PREFIX = "xxl.job.admin";
@@ -33,5 +28,20 @@ public class XxlJobAdminProperties {
 	 * 调度中心部署跟地址 [选填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；
 	 */
 	private String addresses;
-	
+
+	/**
+	 * 调度中心登录账号
+	 */
+	private String username;
+
+	/**
+	 * 调度中心登录密码
+	 */
+	private String password;
+
+	/**
+	 * 调度中心登录状态保持，开启后xxl-job登录状态不过期，默认：2H
+	 */
+	private boolean remember;
+
 }

@@ -15,11 +15,10 @@
  */
 package com.xxl.job.spring.boot;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(XxlJobExecutorProperties.PREFIX)
 @Getter
@@ -30,10 +29,18 @@ public class XxlJobExecutorProperties {
 	public static final String PREFIX = "xxl.job.executor";
 
 	/**
+	 * Enable XXL-Job Executor.
+	 */
+	private boolean enabled = true;
+
+	/**
 	 * 	执行器AppName [必填]：执行器心跳注册分组依据；为空则关闭自动注册.
 	 */
-	private String appname = "${spring.application.name}";
-		/**
+	private String appname = "";
+
+	private String title = "";
+
+	/**
 	 * 	执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"；
 	 */
 	private String ip = "";
@@ -49,5 +56,11 @@ public class XxlJobExecutorProperties {
 	 * 	执行器日志保存天数 [选填] ：值大于3时生效，启用执行器Log文件定期清理功能，否则不生效；
 	 */
 	private int logretentiondays = 30;
-	
+	/**
+	 * 执行器，任务Handler名称
+	 */
+	private String defaultExecutorHandler = XxlJobConstants.DEFAULT_HTTP_JOB_HANDLER;
+
+
+
 }

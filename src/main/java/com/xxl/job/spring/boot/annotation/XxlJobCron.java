@@ -15,63 +15,87 @@
  */
 package com.xxl.job.spring.boot.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.spring.boot.ExecutorRouteStrategyEnum;
+import com.xxl.job.core.glue.GlueTypeEnum;
+import com.xxl.job.spring.boot.executor.ExecutorRouteStrategyEnum;
+import com.xxl.job.spring.boot.executor.MisfireStrategyEnum;
+import com.xxl.job.spring.boot.executor.ScheduleTypeEnum;
+
+import java.lang.annotation.*;
 
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface XxlJobCron {
 
-	/*
+	/**
+	 * 任务UID编号
+	 */
+	String uid() default "";
+
+	/**
 	 * 任务执行CRON表达式
 	 */
 	String cron() default "";
 
-	/*
+	/**
 	 * 负责人
 	 */
 	String author() default "xxl-job";
 
-	/*
+	/**
 	 * 报警邮件
 	 */
 	String alarmEmail() default "";
 
-	/*
+	/**
+	 * 调度类型 ScheduleTypeEnum
+	 */
+	ScheduleTypeEnum scheduleType() default ScheduleTypeEnum.CRON;
+
+	/**
 	 * 执行器描述
 	 */
 	String desc() default "";
 
-	/*
+	/**
 	 * 执行器，任务参数
 	 */
 	String param() default "";
 
-	/*
+	/**
 	 * 失败重试次数
 	 */
 	int failRetryCount() default 3;
 
-	/*
-	 * 阻塞处理策略
+	/**
+	 * GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
 	 */
-	ExecutorBlockStrategyEnum blockStrategy() default ExecutorBlockStrategyEnum.COVER_EARLY;
+	GlueTypeEnum glueType() default GlueTypeEnum.BEAN;
 
-	/*
+	/**
 	 * 执行器路由策略
 	 */
 	ExecutorRouteStrategyEnum routeStrategy() default ExecutorRouteStrategyEnum.LEAST_FREQUENTLY_USED;
 
-	/*
+	/**
+	 * 阻塞处理策略
+	 */
+	ExecutorBlockStrategyEnum blockStrategy() default ExecutorBlockStrategyEnum.COVER_EARLY;
+
+	/**
+	 * 调度过期策略
+	 */
+	MisfireStrategyEnum misfireStrategy() default MisfireStrategyEnum.DO_NOTHING;
+
+	/**
 	 * 任务执行超时时间，单位秒
 	 */
 	int timeout() default 3000;
+
+	/**
+	 * 自启动
+	 */
+	boolean selfStarting() default false;
 
 }
