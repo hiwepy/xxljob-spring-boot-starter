@@ -24,8 +24,6 @@ import com.xxl.job.spring.boot.model.XxlJobGroup;
 import com.xxl.job.spring.boot.model.XxlJobGroupList;
 import com.xxl.job.spring.boot.model.XxlJobInfo;
 import com.xxl.job.spring.boot.model.XxlJobInfoList;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -45,13 +43,13 @@ import java.util.*;
  */
 @Slf4j
 public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
-	
+
 	private XxlJobTemplate xxlJobTemplate;
     private String appName;
     private String appTitle;
 	private List<XxlJobInfo> cacheJobs = new ArrayList<>();
 	private Random RANDOM_ORDER = new Random(10);
-	
+
 	public XxlJobAutoBindingSpringExecutor(XxlJobTemplate xxlJobTemplate) {
         this.xxlJobTemplate = xxlJobTemplate;
 	}
@@ -128,7 +126,7 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
                 XxlJob xxlJob = methodXxlJobEntry.getValue();
                 // regist
                 registJobHandler(xxlJob, bean, executeMethod);
-                registJobHandlerCronTask(xxlJob, bean, executeMethod);
+                registJobHandlerCronTaskInfo(xxlJob, bean, executeMethod);
             }
 
             registJobHandlerCronTaskToAdmin();
@@ -136,7 +134,7 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
         }
     }
 
-    private void registJobHandlerCronTask(XxlJob xxlJob, Object bean, Method executeMethod) {
+    private void registJobHandlerCronTaskInfo(XxlJob xxlJob, Object bean, Method executeMethod) {
         try {
 
             String name = xxlJob.value();
@@ -152,18 +150,17 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
             }
 
             XxlJobInfo xxlJobInfo = new XxlJobInfo();
-
             // 任务描述
             xxlJobInfo.setJobDesc(xxlJobCron.desc());
+            // 调度配置，值含义取决于调度类型
+            xxlJobInfo.setScheduleConf(xxlJobCron.cron());
+            xxlJobInfo.setJobCron(xxlJobCron.cron());
             // 负责人
             xxlJobInfo.setAuthor(xxlJobCron.author());
             // 报警邮件
             xxlJobInfo.setAlarmEmail(xxlJobCron.alarmEmail());
             // 调度类型
             xxlJobInfo.setScheduleType(xxlJobCron.scheduleType().name());
-            // Cron
-            xxlJobInfo.setScheduleConf(xxlJobCron.cron());
-            xxlJobInfo.setJobCron(xxlJobCron.cron());
             // 运行模式
             xxlJobInfo.setGlueType(xxlJobCron.glueType().name());
             // JobHandler
@@ -292,7 +289,7 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
 	public XxlJobTemplate getXxlJobTemplate() {
 		return xxlJobTemplate;
 	}
-	
+
     // ---------------------- applicationContext ----------------------
 	public ApplicationContext applicationContext;
 
@@ -300,5 +297,5 @@ public class XxlJobAutoBindingSpringExecutor extends XxlJobSpringExecutor {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-    
+
 }

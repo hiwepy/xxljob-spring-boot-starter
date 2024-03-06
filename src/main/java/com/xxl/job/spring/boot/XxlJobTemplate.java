@@ -37,6 +37,7 @@ import java.util.Map;
 @Slf4j
 public class XxlJobTemplate {
 
+	public final static String EMPTY = "";
 	public final static String APPLICATION_JSON_VALUE = "application/json";
 	public final static String APPLICATION_JSON_UTF8_VALUE = "application/json;charset=UTF-8";
 	public final static okhttp3.MediaType APPLICATION_JSON = okhttp3.MediaType.parse(APPLICATION_JSON_VALUE);
@@ -49,7 +50,7 @@ public class XxlJobTemplate {
 
 	public XxlJobTemplate( OkHttpClient okhttp3Client,
 						   XxlJobProperties properties,
-			XxlJobAdminProperties adminProperties, 
+			XxlJobAdminProperties adminProperties,
 			XxlJobExecutorProperties executorProperties) {
 		this.okhttp3Client = okhttp3Client;
 		this.properties = properties;
@@ -114,6 +115,18 @@ public class XxlJobTemplate {
 		log.error("xxl-job logout fail.");
 		// xxl-job admin 请求结果失败
 		return new ReturnT<String>(ReturnT.FAIL_CODE, response.toString());
+	}
+
+
+	/**
+	 * 获取xxl-job 执行器列表数据
+	 * @param start	起始位置
+	 * @param length 数量
+	 * @param jobGroup 执行器主键ID
+	 * @return
+	 */
+	public ReturnT<XxlJobGroupList> jobInfoGroupList(int start, int length) {
+		return this.jobInfoGroupList(start, length, EMPTY, EMPTY);
 	}
 
 	/**
@@ -208,7 +221,7 @@ public class XxlJobTemplate {
 	 * @return
 	 */
 	public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup) {
-		return this.jobInfoList(start, length, jobGroup, -1, null, null, null);
+		return this.jobInfoList(start, length, jobGroup, -1, EMPTY, EMPTY, EMPTY);
 	}
 
 	/**
@@ -220,7 +233,7 @@ public class XxlJobTemplate {
 	 * @return
 	 */
     public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup, Integer triggerStatus) {
-    	return this.jobInfoList(start, length, jobGroup, triggerStatus, "", "", "");
+    	return this.jobInfoList(start, length, jobGroup, triggerStatus, EMPTY, EMPTY, EMPTY);
 	}
 
 	/**
@@ -362,7 +375,7 @@ public class XxlJobTemplate {
 	private Request buildRequestEntity(String url, Map<String, Object> paramMap) {
 		return this.buildRequestEntity(url, paramMap, false);
 	}
-	
+
 	private Request buildRequestEntity(String url, Map<String, Object> paramMap, boolean isLoginRequest) {
 
 		// xxl-job admin 请求头
@@ -474,5 +487,5 @@ public class XxlJobTemplate {
 		address = adminProperties.getAddresses() + suffix;
 		return address;
 	}
-	    
+
 }

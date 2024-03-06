@@ -64,11 +64,6 @@ public @interface XxlJobCron {
 	String param() default "";
 
 	/**
-	 * 失败重试次数
-	 */
-	int failRetryCount() default 3;
-
-	/**
 	 * GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
 	 */
 	GlueTypeEnum glueType() default GlueTypeEnum.BEAN;
@@ -93,6 +88,10 @@ public @interface XxlJobCron {
 	 */
 	int timeout() default 3000;
 
+	/**
+	 * 失败重试次数
+	 */
+	int failRetryCount() default 3;
 	/**
 	 * 自启动
 	 */

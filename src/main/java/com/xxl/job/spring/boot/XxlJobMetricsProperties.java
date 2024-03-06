@@ -4,13 +4,12 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @ConfigurationProperties(XxlJobMetricsProperties.PREFIX)
 @Data
 public class XxlJobMetricsProperties {
-	
+
 	public static final String PREFIX = "xxl.job.metrics";
 
 	/**

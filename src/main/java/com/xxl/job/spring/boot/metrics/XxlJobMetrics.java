@@ -15,7 +15,6 @@
  */
 package com.xxl.job.spring.boot.metrics;
 
-import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import com.xxl.job.core.thread.TriggerCallbackThread;
 import io.micrometer.core.instrument.*;
@@ -107,7 +106,7 @@ public class XxlJobMetrics implements MeterBinder, ApplicationListener<Applicati
 				.tags(tags)
 				.register(registry);
 	}
-	
+
 	private <T> void bindTimeGauge(MeterRegistry registry, String name, String desc, T metricResult,
 							   ToDoubleFunction<T> consumer) {
 		TimeGauge.builder(name, metricResult, TimeUnit.SECONDS, consumer)
