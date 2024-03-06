@@ -31,7 +31,7 @@ public class XxlJobExecutorProperties {
 	/**
 	 * Enable XXL-Job Executor.
 	 */
-	private boolean enabled = true;
+	private boolean enabled = Boolean.FALSE;
 
 	/**
 	 * 	执行器AppName [必填]：执行器心跳注册分组依据；为空则关闭自动注册.
