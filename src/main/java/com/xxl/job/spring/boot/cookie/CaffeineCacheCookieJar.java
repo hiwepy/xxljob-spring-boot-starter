@@ -43,7 +43,7 @@ public class CaffeineCacheCookieJar implements CookieJar {
 
     public CaffeineCacheCookieJar(long maximumSize, Duration expireAfterWrite, Duration expireAfterAccess) {
         this.cookieCache = Caffeine.newBuilder()
-                .initialCapacity(10)
+                .initialCapacity(Math.min(10, (int) maximumSize))
                 .maximumSize(maximumSize)
                 .removalListener(new RemovalListener<String, List<Cookie>>() {
 

@@ -13,7 +13,7 @@
 	<groupId>com.github.hiwepy</groupId>
 	<artifactId>xxljob-spring-boot-starter</artifactId>
 	<description>Spring Boot Starter For XXL-Job</description>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.6-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>https://github.com/hiwepy/${project.artifactId}</url>
 	<packaging>jar</packaging>
@@ -374,7 +374,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<caffeine.version>2.9.3</caffeine.version>
 		<micrometer.version>1.10.4</micrometer.version>
-		<fastjson.version>2.0.10</fastjson.version>
+		<fastjson2.version>2.0.34</fastjson2.version>
 		<okhttp3.version>3.14.9</okhttp3.version>
 		<xxl-job.version>2.4.0</xxl-job.version>
 		<maven.version>3.0</maven.version>
@@ -389,11 +389,11 @@
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+			<!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
 			<dependency>
-			    <groupId>com.alibaba</groupId>
-			    <artifactId>fastjson</artifactId>
-			    <version>${fastjson.version}</version>
+				<groupId>com.alibaba.fastjson2</groupId>
+				<artifactId>fastjson2</artifactId>
+				<version>${fastjson2.version}</version>
 			</dependency>
 			<!-- https://mvnrepository.com/artifact/com.xuxueli/xxl-job-core -->
 			<dependency>
@@ -464,8 +464,8 @@
 			<artifactId>spring-web</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.alibaba</groupId>
-		    <artifactId>fastjson</artifactId>
+			<groupId>com.alibaba.fastjson2</groupId>
+			<artifactId>fastjson2</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>com.xuxueli</groupId>
