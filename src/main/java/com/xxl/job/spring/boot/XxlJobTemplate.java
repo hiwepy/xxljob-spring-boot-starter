@@ -93,7 +93,8 @@ public class XxlJobTemplate {
 
 	/**
 	 * 退出登录
-	 * @return
+	 * @return ReturnT 返回结果
+	 * @throws IOException IO异常
 	 */
 	public ReturnT<String> logout() throws IOException {
 		// xxl-job admin 请求参数
@@ -120,8 +121,7 @@ public class XxlJobTemplate {
 	 * 获取xxl-job 执行器列表数据
 	 * @param start	起始位置
 	 * @param length 数量
-	 * @param jobGroup 执行器主键ID
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<XxlJobGroupList> jobInfoGroupList(int start, int length) {
 		return this.jobInfoGroupList(start, length, EMPTY, EMPTY);
@@ -133,7 +133,7 @@ public class XxlJobTemplate {
 	 * @param length 数量
 	 * @param appname 执行器名称
 	 * @param title 执行器标题
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<XxlJobGroupList> jobInfoGroupList(int start, int length, String appname, String title) {
 		// xxl-job admin 请求参数
@@ -152,7 +152,7 @@ public class XxlJobTemplate {
 	/**
 	 * 获取调度任务组
 	 * @param jobGroupId 调度任务组ID
-	 * @return ReturnT
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<XxlJobGroup> jobInfoGroup(Integer jobGroupId) {
 		if ( Objects.isNull(jobGroupId)) {
@@ -171,7 +171,7 @@ public class XxlJobTemplate {
 	/**
 	 * 添加调度任务组
 	 * @param jobGroup 调度任务组信息Model
-	 * @return	ReturnT
+	 * @return	ReturnT 返回结果
 	 */
 	public ReturnT<String> addJobGroup(XxlJobGroup jobGroup) {
 		if ( Objects.isNull(jobGroup)) {
@@ -189,7 +189,7 @@ public class XxlJobTemplate {
 	/**
 	 * 更新调度任务组
 	 * @param jobGroup 调度任务组信息Model
-	 * @return ReturnT
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<String> updateJobGroup(XxlJobGroup jobGroup) {
 		// xxl-job admin 请求参数
@@ -204,7 +204,7 @@ public class XxlJobTemplate {
 	/**
 	 * 删除调度任务组
 	 * @param jobGroupId 调度任务组ID
-	 * @return	ReturnT
+	 * @return	ReturnT 返回结果
 	 */
 	public ReturnT<String> removeJobGroup(Integer jobGroupId) {
 		if ( Objects.isNull(jobGroupId)) {
@@ -225,7 +225,7 @@ public class XxlJobTemplate {
 	 * @param start	起始位置
 	 * @param length 数量
 	 * @param jobGroup 执行器主键ID
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup) {
 		return this.jobInfoList(start, length, jobGroup, -1, EMPTY, EMPTY, EMPTY);
@@ -237,7 +237,7 @@ public class XxlJobTemplate {
 	 * @param length 数量
 	 * @param jobGroup 执行器主键ID
 	 * @param triggerStatus 调度状态：0-停止，1-运行
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
     public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup, Integer triggerStatus) {
     	return this.jobInfoList(start, length, jobGroup, triggerStatus, EMPTY, EMPTY, EMPTY);
@@ -252,7 +252,7 @@ public class XxlJobTemplate {
 	 * @param jobDesc 任务描述
 	 * @param executorHandler 执行器任务handler
 	 * @param author 任务创建者
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
     public ReturnT<XxlJobInfoList> jobInfoList(int start, int length, Integer jobGroup,
 											   Integer triggerStatus, String jobDesc, String executorHandler, String author) {
@@ -279,7 +279,7 @@ public class XxlJobTemplate {
 	 * 新增不重复的调度任务
 	 * @param jobInfo 调用任务信息Model
 	 * @return 任务id
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<String> addUniqueJob(XxlJobInfo jobInfo) {
 		if (Objects.isNull(jobInfo)) {
@@ -312,7 +312,7 @@ public class XxlJobTemplate {
 	 * 新增调度任务
 	 * @param jobInfo 调用任务信息Model
 	 * @return 任务id
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<String> addJob(XxlJobInfo jobInfo) {
 		if (Objects.isNull(jobInfo)) {
@@ -336,7 +336,7 @@ public class XxlJobTemplate {
 	/**
 	 * 修改调度任务
 	 * @param jobInfo 调用任务信息Model
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
     public ReturnT<String> updateJob(XxlJobInfo jobInfo) {
 		if (Objects.isNull(jobInfo)) {
@@ -360,7 +360,7 @@ public class XxlJobTemplate {
 	/**
 	 * 删除调度任务
 	 * @param jobId 任务id
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
     public ReturnT<String> removeJob(Integer jobId) {
 		if ( Objects.isNull(jobId)) {
@@ -379,7 +379,7 @@ public class XxlJobTemplate {
 	/**
 	 * 停止调度
 	 * @param jobId 任务id
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
     public ReturnT<String> stopJob(Integer jobId) {
 		if ( Objects.isNull(jobId)) {
@@ -398,7 +398,7 @@ public class XxlJobTemplate {
 	/**
 	 * 开启调度
 	 * @param jobId 任务id
-	 * @return
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<String> startJob(Integer jobId) {
 		if ( Objects.isNull(jobId)) {
@@ -418,7 +418,7 @@ public class XxlJobTemplate {
 	 *
 	 * 手动触发一次调度
 	 * @param jobInfo 调用任务信息Model
-	 * @return ReturnT
+	 * @return ReturnT 返回结果
 	 */
 	public ReturnT<String> triggerJob(XxlJobInfo jobInfo) {
 		if (Objects.isNull(jobInfo)) {
@@ -431,7 +431,7 @@ public class XxlJobTemplate {
 	 * 手动触发一次调度
 	 * @param jobInfoId 调用任务ID
 	 * @param executorParam 执行器参数
-	 * @return ReturnT
+	 * @return ReturnT 返回结果
 	 */
     public ReturnT<String> triggerJob(Integer jobInfoId, String executorParam) {
 		if ( Objects.isNull(jobInfoId)) {
@@ -448,10 +448,23 @@ public class XxlJobTemplate {
 		return this.doRequest(request);
     }
 
+	/**
+	 * 构建请求实体
+	 * @param url 调用任务URL
+	 * @param paramMap 执行器参数
+	 * @return ReturnT 返回结果
+	 */
 	private Request buildRequestEntity(String url, Map<String, Object> paramMap) {
 		return this.buildRequestEntity(url, paramMap, false);
 	}
 
+	/**
+	 * 构建请求实体
+	 * @param url 调用任务URL
+	 * @param paramMap 执行器参数
+	 * @param isLoginRequest 是否登录请求
+	 * @return ReturnT 返回结果
+	 */
 	private Request buildRequestEntity(String url, Map<String, Object> paramMap, boolean isLoginRequest) {
 
 		// xxl-job admin 请求头
