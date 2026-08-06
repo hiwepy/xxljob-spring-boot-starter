@@ -443,6 +443,7 @@
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-nexus-staging-plugin.version>1.7.0</maven-nexus-staging-plugin.version>
+                <xxljob-extension-spring.version>1.0.x.20260630-SNAPSHOT</xxljob-extension-spring.version>
     </properties>
 
     <dependencyManagement>
@@ -460,7 +461,12 @@
                 <artifactId>xxl-job-core</artifactId>
                 <version>${xxl-job.version}</version>
             </dependency>
-        </dependencies>
+                <dependency>
+            <groupId>io.github.hiwepy</groupId>
+            <artifactId>xxljob-extension-spring</artifactId>
+            <version>${xxljob-extension-spring.version}</version>
+        </dependency>
+</dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -541,7 +547,7 @@
         <dependency>
             <groupId>io.github.hiwepy</groupId>
             <artifactId>xxljob-extension-spring</artifactId>
-            <version>1.0.x.20260630-SNAPSHOT</version>
+            <version>${xxljob-extension-spring.version}</version>
         </dependency>
         <!-- For Spring Boot AOP -->
         <dependency>
