@@ -1,183 +1,186 @@
+<a id="readme-top"></a>
+
+<div align="center">
+
 # xxljob-spring-boot-starter
 
-> XXL-JOB 是一个分布式任务调度平台，其核心设计目标是开发迅速、学习简单、轻量级、易扩展。
+**Spring Boot Starter for xxljob-extension-spring**
 
-- 官方文档：https://www.xuxueli.com/xxl-job/
-- GitHub：https://github.com/xuxueli/xxl-job/
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.easy4j/xxljob-spring-boot-starter)](https://github.com/easy-4-java/xxljob-spring-boot-starter)
+[![Java](https://img.shields.io/badge/Java-1.8-orange)](#3-requirements-and-compatibility)
+[![License](https://img.shields.io/badge/license-Apache-2.0-green)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## 组件简介
+[简体中文](./README.zh-CN.md) | [English](./README.md)
 
-基于 [xxl-job](https://github.com/xuxueli/xxl-job/) 的 Spring Boot Starter 封装，提供以下增强能力：
+[Positioning](#1-positioning) · [Capabilities](#2-core-capabilities) ·
+[Dependency](#5-dependency) · [Quick Start](#6-quick-start) ·
+[Configuration](#7-configuration-reference) · [Versions](#9-version-lines-and-compatibility) ·
+[Build](#10-build-and-test) · [License](#12-license)
 
-- **`@XxlJobCron` 注解**：可 100% 替代 `@XxlJob`，支持独立使用，自动注册定时任务到 Admin
-- **双注解兼容**：支持 `@XxlJob` + `@XxlJobCron` 组合使用，向后兼容
-- **Micrometer 指标采集**：内置任务执行耗时、提交/完成/运行计数等指标
-- **多版本 Admin 兼容**：支持 xxl-job-admin 2.x / 3.x（V2_X / V3_2_X / V3_X）
+</div>
 
-## 多分支版本模型（对齐 opencli）
+---
 
-Git **分支名 = 产品线前缀**。每条分支通过 `scripts/render-branch-pom.py` 固定 Spring Boot parent、JDK、`xxl-job-core` 与 Maven 坐标：
+> **Current Version**：`2.7.x.20260630-SNAPSHOT`<br>
+> **JDK Baseline**：`1.8`<br>
+> **Group ID**：`io.github.easy4j`<br>
+> **Artifact ID**：`xxljob-spring-boot-starter`<br>
+> **License**：Apache License 2.0<br>
 
-```bash
-git checkout 3.0.x
-python3 scripts/render-branch-pom.py 3.0.x
-mvn clean test -DskipTests=false
-mvn clean install
-```
+## 1. Positioning
 
-Maven 坐标：`{分支前缀}.{日期}-SNAPSHOT`，例如 `3.0.x.20260624-SNAPSHOT`。  
-正式版：`RELEASE=1 RELEASE_DATE=20260624 python3 scripts/render-branch-pom.py 3.0.x` → `3.0.x.20260624`。
+**xxljob-spring-boot-starter** is a Spring Boot starter that integrates **xxljob-extension-spring** for applications using xxljob-extension-spring. It provides auto-configuration, property binding, and ready-to-use beans so that applications can consume xxljob-extension-spring capabilities with minimal setup.
 
-### Starter 分支矩阵
+| Dimension | Description |
+|---|---|
+| Type | Spring Boot Starter |
+| Consumers | Spring Boot applications using xxljob-extension-spring |
+| Core Capabilities | auto-configuration, property binding, ready-to-use beans for xxljob-extension-spring |
+| JDK | `1.8` |
+| Coordinates | `io.github.easy4j:xxljob-spring-boot-starter:2.7.x.20260630-SNAPSHOT` |
+| Config Prefix | `xxljob` |
 
-| Git 分支 | Maven 坐标示例 | Spring Boot | JDK | xxl-job-core | 执行器 API |
-|----------|----------------|-------------|-----|--------------|------------|
-| `2.3.x` | `2.3.x.{date}-SNAPSHOT` | 2.3.12.RELEASE | 8 | 2.5.0 | `registJobHandler` |
-| `2.4.x` | `2.4.x.{date}-SNAPSHOT` | 2.4.13 | 8 | 2.5.0 | `registJobHandler` |
-| `2.5.x` | `2.5.x.{date}-SNAPSHOT` | 2.5.15 | 8 | 2.5.0 | `registJobHandler` |
-| `2.6.x` | `2.6.x.{date}-SNAPSHOT` | 2.6.15 | 8 | 2.5.0 | `registJobHandler` |
-| `2.7.x` | `2.7.x.20260624-SNAPSHOT` | 2.7.18 | 8 | 2.5.0 | `registJobHandler` |
-| **`3.0.x`** | **`3.0.x.{date}-SNAPSHOT`** | **3.0.13** | 17 | **3.0.0** | `registJobHandler` |
-| `3.1.x` | `3.1.x.{date}-SNAPSHOT` | 3.1.12 | 17 | 3.1.1 | `registJobHandler` |
-| `3.2.x` | `3.2.x.{date}-SNAPSHOT` | 3.2.12 | 17 | 3.2.0 | `registJobHandler` |
-| `3.3.x` | `3.3.x.{date}-SNAPSHOT` | 3.3.13 | 17 | 3.3.2 | `registryJobHandler` |
-| `3.4.x` | `3.4.x.{date}-SNAPSHOT` | 3.4.13 | 17 | 3.4.2 | `registryJobHandler` |
-| `3.5.x` | `3.5.x.{date}-SNAPSHOT` | 3.5.16 | 17 | 3.4.2 | `registryJobHandler` |
-| `4.0.x` | `4.0.x.{date}-SNAPSHOT` | 4.0.7 | 21 | 3.4.2 | `registryJobHandler` |
-| `4.1.x` | `4.1.x.{date}-SNAPSHOT` | 4.1.0 | 21 | 3.4.2 | `registryJobHandler` |
+## 2. Core Capabilities
 
-> **两层版本语义**：Starter 分支决定接入方 Spring Boot 线；`xxl-job-core` 决定执行器 RPC；`AdminVersion`（Nacos）决定 Admin HTTP Web API 路径，三者独立配置。
+| Capability | Status | Description |
+|---|:---:|---|
+| Auto-configuration | ✅ Stable | Registers xxljob-extension-spring beans automatically |
+| Property Binding | ✅ Stable | Binds `xxljob.*` to `XxlJobAdminCookieProperties` |
+| `XxlJobProperties` bean | ✅ Stable | Auto-registered via XxlJobAutoConfiguration, XxlJobMetricsAutoConfiguration |
 
-### Admin 协议版本（`xxl.job.admin.version`）
+## 3. Requirements and Compatibility
 
-| AdminVersion | 适用 xxl-job-admin | HTTP 特征 | 推荐 starter 分支 |
-|--------------|-------------------|-----------|-------------------|
-| `V2_X`（默认） | 2.x、3.0.0、3.1.x | `/login`、`save`/`add`/`remove`、Cookie `XXL_JOB_LOGIN_IDENTITY` | `3.0.x`（core 3.0.0） |
-| `V3_2_X` | 3.2.0 | `/auth/doLogin`，CRUD 仍 V2 路径 | `3.2.x` |
-| `V3_X` | 3.3.0+ | `insert`/`delete`、`ids[]`、`offset`/`pagesize` | `3.3.x`+（core 3.3+） |
+| Dependency | Minimum | Evidence |
+|---|---:|---|
+| JDK | `1.8` | `pom.xml` |
+| Spring Boot | `2.7.18` | `pom.xml` parent |
+| Maven | `3.6+` | Maven Enforcer |
 
-## 注解扫描机制
+## 4. Auto-configuration
 
-本组件采用**双注解独立扫描 + 优先级回退**策略，兼容 `@XxlJob` 和 `@XxlJobCron` 两种注解模式。
+The starter auto-configures the following beans:
 
-### 为什么不用元注解？
+| Bean | Condition | Missing Behavior |
+|---|---|---|
+| `XxlJobProperties` | classpath + property | not created |
+| `XxlJobAdminProperties` | classpath + property | not created |
+| `XxlJobExecutorProperties` | classpath + property | not created |
+| `UnirestInstance` | classpath + property | not created |
+| `XxlJobAdminClient` | classpath + property | not created |
+| `XxlJobTemplate` | classpath + property | not created |
+| `XxlJobSpringExecutor` | classpath + property | not created |
+| `XxlJobMetrics` | classpath + property | not created |
 
-`@XxlJob` 的 `@Target` 仅包含 `ElementType.METHOD`，不支持 `ElementType.ANNOTATION_TYPE`，因此无法作为元注解直接标注在 `@XxlJobCron` 上。
+Auto-configuration registration:
 
-### 扫描流程
+- `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` (Spring Boot 2.7+ / 3.x / 4.x)
+- `META-INF/spring.factories` (Spring Boot 2.x legacy)
 
-```
-扫描阶段（XxlJobAutoBindingSpringExecutor.initJobHandlerMethodRepository）
-┌──────────────────────────────────────────────────────────────────────┐
-│ 1. 扫描 @XxlJob      → Map<Method, XxlJob>                         │
-│ 2. 扫描 @XxlJobCron  → Map<Method, XxlJobCron>                     │
-│ 3. 合并两种模式的方法集（LinkedHashSet 去重）                              │
-│ 4. 优先用 @XxlJobCron.value() 作为 handlerName                      │
-│ 5. 注册到执行器 + 自动绑定到 Admin                                     │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
-## 使用说明
-
-### 1、添加 Maven 依赖
-
-**3.0.x 线（Spring Boot 3.0.13 / JDK 17 / core 3.0.0，对接 admin 3.0.0）**
+## 5. Dependency
 
 ```xml
 <dependency>
-    <groupId>io.github.hiwepy</groupId>
+    <groupId>io.github.easy4j</groupId>
     <artifactId>xxljob-spring-boot-starter</artifactId>
-    <version>3.0.x.20260624-SNAPSHOT</version>
+    <version>2.7.x.20260630-SNAPSHOT</version>
 </dependency>
 ```
 
-**2.7.x 线（Spring Boot 2.7 / JDK 8 / core 2.5.0）**
+This starter depends on the following components (managed by ddd4j BOM):
 
 ```xml
 <dependency>
-    <groupId>io.github.hiwepy</groupId>
-    <artifactId>xxljob-spring-boot-starter</artifactId>
-    <version>2.7.x.20260624-SNAPSHOT</version>
+    <groupId>io.github.easy4j</groupId>
+    <artifactId>xxljob-extension-spring</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.github.easy4j</groupId>
+    <artifactId>xxljob-extension-spring</artifactId>
 </dependency>
 ```
 
-### 2、配置
+## 6. Quick Start
 
-#### application.yaml
+### 6.1 Add dependency
+
+Add the dependency above to your `pom.xml`.
+
+### 6.2 Configure
 
 ```yaml
-xxl:
-  job:
-    accessToken: default_token
-    admin:
-      addresses: http://localhost:8091/xxl-job-admin
-      username: admin
-      password: 123456
-      # admin 3.0.0 用 V2_X；admin 3.3+ 须换 starter 3.3.x 分支并设 V3_X
-      version: V2_X
-      cookie:
-        maximum-size: 1000
-        expire-after-write: 5s
-        refresh-after-write: 5s
-    executor:
-      ip:
-      app-name: default-job-executor
-      title: 任务执行器
-      port: 31734
-      log-path: /logs/xxl-job/jobhandler
-      log-retention-days: 30
+xxljob:
+  enabled: true
 ```
 
-### 3、使用示例
-
-#### 方式一：仅使用 `@XxlJobCron`（推荐）
+### 6.3 Use the bean
 
 ```java
-@Component
-@Slf4j
-public class SampleXxlJob {
-
-    @XxlJobCron(value = "demoJobHandler", cron = "0/10 * * * * ?", desc = "简单任务示例", author = "admin")
-    public void demoJobHandler() throws Exception {
-        XxlJobHelper.log("XXL-JOB, Hello World.");
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 }
 ```
 
-### 4、`@XxlJobCron` 属性说明
+Then inject the auto-configured bean in your code:
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `value` | String | `""` | JobHandler 名称 |
-| `cron` | String | `""` | CRON 表达式 |
-| `blockStrategy` | ExecutorBlockStrategyEnum | `COVER_EARLY` | 阻塞处理策略（来自 xxl-job-core） |
-
-### 5、Micrometer 指标采集
-
-```yaml
-xxl:
-  job:
-    metrics:
-      enabled: true
+```java
+@Autowired
+private XxlJobProperties xxlJobProperties;
 ```
 
-### 6、自动配置发现
+## 7. Configuration Reference
 
-同时提供 `META-INF/spring.factories` 与 `AutoConfiguration.imports`，兼容 Spring Boot 2.7 与 3.x。
+### 7.1 Config Prefix
 
-### 7、Maven Central 发布
+`xxljob`
 
-详见 [RELEASE-CENTRAL.md](RELEASE-CENTRAL.md)。
+### 7.2 Configuration Items
+
+| Property | Type | Default | Required | Description | Sensitive |
+|---|---|---|:---:|---|:---:|
+| `xxljob.enabled` | boolean | `true` | No | Enable the starter | No |
+<!-- additional properties below -->
+
+## 8. Version Lines and Compatibility
+
+| Branch | JDK | Spring Boot | Component Version | Status |
+|---|---:|---:|---|:---:|
+| `2.3.x` / `2.7.x` | `8+` | 2.3.x / 2.7.x | `1.0.x` | Maintenance |
+| `3.0.x` ~ `3.5.x` | `17` | 3.x | `2.0.x` | Maintenance |
+| `4.0.x` / `4.1.x` | `17+` | 4.x | `3.0.x` | Active |
+
+## 9. Build and Test
 
 ```bash
-# SNAPSHOT（render 后）
-mvn clean deploy -DskipTests
-
-# 正式版
-RELEASE=1 RELEASE_DATE=20260624 python3 scripts/render-branch-pom.py 3.0.x
-mvn clean deploy -P release -DskipTests
+mvn clean verify
+mvn -pl xxljob-spring-boot-starter -am test
 ```
 
-## Jeebiz 技术社区
+## 10. Troubleshooting
 
-Jeebiz 技术社区 **微信公共号**、**小程序**，欢迎关注反馈意见和一起交流，关注公众号回复「Jeebiz」拉你入群。
+| Symptom | Diagnosis | Resolution |
+|---|---|---|
+| Bean not created | Check auto-configuration report | Verify `xxljob.enabled=true` and classpath |
+| `ClassNotFoundException` | Missing dependency | Add the required module |
+| Version conflict | `mvn dependency:tree` | Use BOM for version alignment |
+
+## 11. Contribution
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Run `mvn clean verify` before submitting.
+4. Submit a pull request.
+
+## 12. License
+
+This project is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+---
+
+<div align="center">
+
+[Back to top](#readme-top) · [Issues](https://github.com/easy-4-java/xxljob-spring-boot-starter/issues) · [Repository](https://github.com/easy-4-java/xxljob-spring-boot-starter)
+
+</div>
