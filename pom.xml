@@ -229,6 +229,8 @@
         <xxl-tool.version>2.5.0</xxl-tool.version>
         <xxl-job-extension.version>2.0.x.20260630-SNAPSHOT</xxl-job-extension.version>
 
+                <commons-io.version>2.22.0</commons-io.version>
+                <slf4j.version>2.0.18</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -270,7 +272,18 @@
                 <artifactId>xxljob-extension-spring</artifactId>
                 <version>${xxl-job-extension.version}</version>
             </dependency>
-        </dependencies>
+                <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+            <scope>test</scope>
+        </dependency>
+</dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -285,7 +298,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.13</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <!-- For Servlet Api -->
         <dependency>
@@ -378,7 +391,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>${commons-io.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
