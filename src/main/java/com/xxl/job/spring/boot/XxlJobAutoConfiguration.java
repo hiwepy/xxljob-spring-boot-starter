@@ -7,7 +7,6 @@ import com.xxl.job.core.admin.XxlJobAdminClient;
 import com.xxl.job.core.config.XxlJobAdminConfig;
 import com.xxl.job.core.executor.XxlJobExecutor;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import com.xxl.job.spring.XxlJobAutoBindingAndMetricsSpringExecutor;
 import com.xxl.job.spring.XxlJobAutoBindingSpringExecutor;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -23,6 +22,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -30,6 +30,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -90,7 +91,7 @@ public class XxlJobAutoConfiguration {
 	public UnirestInstance unirestInstance() {
 		UnirestInstance instance = Unirest.spawnInstance();
 		SSLContext sslContext = createTrustAllSslContext();
-		if (sslContext != null) {
+		if (Objects.nonNull(sslContext)) {
 			instance.config().sslContext(sslContext);
 		}
 		instance.config()
@@ -147,18 +148,22 @@ public class XxlJobAutoConfiguration {
 			XxlJobProperties properties,
 			XxlJobAdminProperties adminProperties,
 			XxlJobExecutorProperties executorProperties,
-			XxlJobMetricsProperties metricsProperties ) {
-		if (metricsProperties.isEnabled()) {
+			XxlJobMetricsProperties metricsProperties) {
+		MeterRegistry registry = registryProvider.getIfAvailable();
+		if (metricsProperties.isEnabled() && Objects.nonNull(registry)) {
 			log.info(">>>>>>>>>>> xxl-job auto binding and metrics executor init.");
 			Collection<Tag> extraTags = CollectionUtils.isEmpty(metricsProperties.getExtraTags()) ? new ArrayList<>() : metricsProperties.getExtraTags()
 					.entrySet().stream().map(e -> Tag.of(e.getKey(), e.getValue()))
 					.collect(Collectors.toList());
 			extraTags.add(Tag.of("executor", executorProperties.getAppname()));
-			XxlJobAutoBindingAndMetricsSpringExecutor xxlJobExecutor = new XxlJobAutoBindingAndMetricsSpringExecutor(registryProvider.getObject(), xxlJobTemplateProvider.getObject(), extraTags);
+			XxlJobAutoBindingAndMetricsSpringExecutor xxlJobExecutor = new XxlJobAutoBindingAndMetricsSpringExecutor(registry, xxlJobTemplateProvider.getObject(), extraTags);
 			xxlJobExecutor.setAppTitle(executorProperties.getTitle());
 			configureExecutor(xxlJobExecutor, adminProperties, executorProperties, properties);
 			return xxlJobExecutor;
 		} else {
+			if (metricsProperties.isEnabled()) {
+				log.warn(">>>>>>>>>>> xxl-job metrics enabled but no MeterRegistry bean is available; falling back to the standard executor.");
+			}
 			log.info(">>>>>>>>>>> xxl-job auto binding executor init.");
 			XxlJobAutoBindingSpringExecutor xxlJobExecutor = new XxlJobAutoBindingSpringExecutor(xxlJobTemplateProvider.getObject());
 			xxlJobExecutor.setAppTitle(executorProperties.getTitle());
@@ -190,7 +195,7 @@ public class XxlJobAutoConfiguration {
 	 * 此处对 null/空/非法格式统一兜底为 {@code -1}（自动探测）。
 	 */
 	private int resolvePort(String port) {
-		if ( port == null || port.trim().isEmpty()) {
+		if (Objects.isNull(port) || !StringUtils.hasText(port)) {
 			return -1;
 		}
 		return Integer.parseInt(port.trim());
