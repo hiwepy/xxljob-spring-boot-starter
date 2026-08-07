@@ -2,7 +2,7 @@ package com.xxl.job.spring.boot;
 
 import com.xxl.job.core.executor.XxlJobExecutor;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import com.xxl.job.spring.metrics.XxlJobMetrics;
+import com.xxl.job.spring.boot.metrics.XxlJobMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 /**
- * XXL Job
+ * XXL-Job Micrometer 指标自动配置。
  */
 @AutoConfigureAfter(MetricsAutoConfiguration.class)
 @Configuration(proxyBeanMethods = false)
