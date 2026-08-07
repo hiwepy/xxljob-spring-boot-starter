@@ -10,12 +10,12 @@
         <relativePath />
     </parent>
 
-    <groupId>io.github.hiwepy</groupId>
+    <groupId>io.github.easy4j</groupId>
     <artifactId>xxljob-spring-boot-starter</artifactId>
     <description>Spring Boot Starter For XXL-Job (line 2.7.x; SB 2.7.18; JDK 1.8; core 2.5.0; executor API regist)</description>
     <version>2.7.x.20260624-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
-    <url>https://github.com/hiwepy/${project.artifactId}</url>
+    <url>https://github.com/easy-4-java/${project.artifactId}</url>
     <packaging>jar</packaging>
 
     <licenses>
@@ -28,9 +28,9 @@
 
     <scm>
 
-        <connection>scm:git:https:github.com/hiwepy/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:https:github.com/hiwepy/${project.artifactId}.git</developerConnection>
-        <url>https:github.com/hiwepy/${project.artifactId}</url>
+        <connection>scm:git:https:github.com/easy-4-java/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:https:github.com/easy-4-java/${project.artifactId}.git</developerConnection>
+        <url>https:github.com/easy-4-java/${project.artifactId}</url>
         <tag>${project.artifactId}</tag>
     </scm>
 
@@ -462,7 +462,7 @@
                 <version>${xxl-job.version}</version>
             </dependency>
                 <dependency>
-            <groupId>io.github.hiwepy</groupId>
+            <groupId>io.github.easy4j</groupId>
             <artifactId>xxljob-extension-spring</artifactId>
             <version>${xxljob-extension-spring.version}</version>
         </dependency>
@@ -545,7 +545,7 @@
         </dependency>
         <!-- Source: https://github.com/easy-4-java/xxljob-extension-spring — easy4j xxljob-extension-spring -->
         <dependency>
-            <groupId>io.github.hiwepy</groupId>
+            <groupId>io.github.easy4j</groupId>
             <artifactId>xxljob-extension-spring</artifactId>
             <version>${xxljob-extension-spring.version}</version>
         </dependency>
