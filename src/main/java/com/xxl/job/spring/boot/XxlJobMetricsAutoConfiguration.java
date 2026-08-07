@@ -2,7 +2,7 @@ package com.xxl.job.spring.boot;
 
 import com.xxl.job.core.executor.XxlJobExecutor;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import com.xxl.job.spring.metrics.XxlJobMetrics;
+import com.xxl.job.spring.boot.metrics.XxlJobMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 /**
- * XXL Job Metrics AutoConfiguration
+ * XXL-Job Micrometer 指标自动配置。
  * <p>
  * Spring Boot 4.0 移除了 actuate.autoconfigure.metrics.MetricsAutoConfiguration，
  * 因此不再使用 @AutoConfigureAfter 引用该类。
