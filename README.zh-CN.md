@@ -53,7 +53,7 @@
 | 依赖 | 最低版本 | 证据来源 |
 |---|---:|---|
 | JDK | `21` | `pom.xml` |
-| Spring Boot | `4.1.0-M4` | `pom.xml` parent |
+| Spring Boot | `4.1.0` | `pom.xml` parent |
 | Maven | `3.6+` | Maven Enforcer |
 
 ## 4. 自动装配
