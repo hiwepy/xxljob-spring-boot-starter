@@ -4,6 +4,12 @@ import com.xxl.job.core.AdminVersion;
 
 import lombok.Data;
 
+/**
+ * <p>Configuration properties for XXL Job Admin.</p>
+ *
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
+ */
 @Data
 public class XxlJobAdminProperties {
 

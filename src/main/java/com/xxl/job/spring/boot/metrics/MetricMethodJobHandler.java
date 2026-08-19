@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 为方法型 XXL-Job Handler 采集提交数、运行数、完成数和执行耗时。
  *
  * <p>所有指标使用稳定名称，并通过 {@code job} 标签区分处理器，避免动态指标名造成高基数。</p>
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
  */
 @Slf4j
 public class MetricMethodJobHandler extends IJobHandler {
@@ -126,6 +128,11 @@ public class MetricMethodJobHandler extends IJobHandler {
     }
 
     @Override
+    /**
+     * to String.
+     *
+     * @return the result
+     */
     public String toString() {
         return super.toString() + "[" + target.getClass() + "#" + method.getName() + "]";
     }

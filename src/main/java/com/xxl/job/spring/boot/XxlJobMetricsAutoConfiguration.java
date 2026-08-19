@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Lazy;
  * Spring Boot 4.0 移除了 actuate.autoconfigure.metrics.MetricsAutoConfiguration，
  * 因此不再使用 @AutoConfigureAfter 引用该类。
  * </p>
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ MeterRegistry.class, XxlJobExecutor.class })
@@ -29,6 +31,12 @@ public class XxlJobMetricsAutoConfiguration {
 	@Bean
 	@Lazy
 	@ConditionalOnProperty(prefix = XxlJobExecutorProperties.PREFIX, value = "enabled", havingValue = "true", matchIfMissing = true)
+	/**
+	 * XXL Job Metrics.
+	 *
+	 * @param executor the executor
+	 * @return the result
+	 */
 	public XxlJobMetrics xxlJobMetrics(@Lazy XxlJobSpringExecutor executor) {
 		return new XxlJobMetrics(executor);
 	}

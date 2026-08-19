@@ -6,6 +6,8 @@ import java.util.Objects;
 
 /**
  * Micrometer 点分指标名称拼接工具。
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
  */
 public final class MetricNames {
 

@@ -23,6 +23,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * <p>兼容存在 {@code TriggerCallbackThread.callBackQueue} 的旧版 core；新版 core 移除该内部结构时
  * 安全跳过队列指标，不影响 starter 启动。</p>
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
  */
 @Slf4j
 public class XxlJobMetrics implements MeterBinder, ApplicationListener<ApplicationStartedEvent> {

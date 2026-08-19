@@ -7,6 +7,8 @@ import java.time.Duration;
 
 /**
  * 调度中心登录状态Cookie缓存配置
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
  */
 
 @ConfigurationProperties(XxlJobAdminCookieProperties.PREFIX)

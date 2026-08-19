@@ -23,6 +23,8 @@ import java.util.Objects;
  *
  * <p>任务扫描和 Admin 自动注册复用 {@link XxlJobAutoBindingSpringExecutor}，仅将方法处理器
  * 替换为 {@link MetricMethodJobHandler}，确保 Spring Boot 专属指标能力留在 starter 中。</p>
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
  */
 public class XxlJobAutoBindingAndMetricsSpringExecutor extends XxlJobAutoBindingSpringExecutor {
 

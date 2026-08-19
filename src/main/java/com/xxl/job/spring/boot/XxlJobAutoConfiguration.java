@@ -39,6 +39,12 @@ import java.util.stream.Collectors;
 	XxlJobAdminCookieProperties.class,
 	XxlJobMetricsProperties.class
 })
+/**
+ * <p>Configuration properties.</p>
+ *
+ * @author <a href="https://github.com/loong10k">Loong Wan</a>
+ * @since 1.0.0
+ */
 @Slf4j
 public class XxlJobAutoConfiguration {
 
@@ -47,12 +53,29 @@ public class XxlJobAutoConfiguration {
 			TrustManager[] trustAllCreds = new TrustManager[]{
 				new X509TrustManager() {
 					@Override
+					/**
+					 * Returns the accepted issuers.
+					 *
+					 * @return the accepted issuers
+					 */
 					public X509Certificate[] getAcceptedIssuers() {
 						return new X509Certificate[0];
 					}
 					@Override
+					/**
+					 * check Client Trusted.
+					 *
+					 * @param certs the certs
+					 * @param authType the auth type
+					 */
 					public void checkClientTrusted(X509Certificate[] certs, String authType) {}
 					@Override
+					/**
+					 * check Server Trusted.
+					 *
+					 * @param certs the certs
+					 * @param authType the auth type
+					 */
 					public void checkServerTrusted(X509Certificate[] certs, String authType) {}
 				}
 			};
@@ -68,6 +91,11 @@ public class XxlJobAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConfigurationProperties(XxlJobProperties.PREFIX)
+	/**
+	 * XXL Job Properties.
+	 *
+	 * @return the result
+	 */
 	public XxlJobProperties xxlJobProperties() {
 		return new XxlJobProperties();
 	}
@@ -75,6 +103,11 @@ public class XxlJobAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConfigurationProperties(XxlJobAdminProperties.PREFIX)
+	/**
+	 * XXL Job Admin Properties.
+	 *
+	 * @return the result
+	 */
 	public XxlJobAdminProperties xxlJobAdminProperties() {
 		return new XxlJobAdminProperties();
 	}
@@ -82,12 +115,22 @@ public class XxlJobAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConfigurationProperties(XxlJobExecutorProperties.PREFIX)
+	/**
+	 * XXL Job Executor Properties.
+	 *
+	 * @return the result
+	 */
 	public XxlJobExecutorProperties xxlJobExecutorProperties() {
 		return new XxlJobExecutorProperties();
 	}
 
 	@Bean(destroyMethod = "close")
 	@ConditionalOnMissingBean
+	/**
+	 * unirest Instance.
+	 *
+	 * @return the result
+	 */
 	public UnirestInstance unirestInstance() {
 		UnirestInstance instance = Unirest.spawnInstance();
 		SSLContext sslContext = createTrustAllSslContext();
